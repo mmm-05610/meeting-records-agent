@@ -68,3 +68,6 @@ coverage/
 
 # pnpm local store
 /.pnpm-store/
+
+# runtime data written by the model gateway
+/services/model-gateway/data/
