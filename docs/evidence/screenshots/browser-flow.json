@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-10-21T19:24:59.289Z",
+  "generated_at": "2026-10-21T19:32:02.653Z",
   "base_url": "http://127.0.0.1:3000",
-  "passed": 11,
-  "failed": 1,
+  "passed": 14,
+  "failed": 0,
   "results": [
     {
       "name": "登录成功并离开登录页",
@@ -51,8 +51,18 @@
     },
     {
       "name": "答案渲染可点击编号引用",
-      "ok": false,
-      "detail": "citations=0"
+      "ok": true,
+      "detail": "citations=12"
+    },
+    {
+      "name": "引用面板显示原文片段",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "引用面板显示来源会议信息",
+      "ok": true,
+      "detail": "来源 1 · 星河笔记 检索方案评审会  会议日期：2026-03-11 · 记录类型：会议纪要 · 片段序号：3  文档 ID：c5712bfe-1590-5"
     },
     {
       "name": "追问得到基于历史的回答",
