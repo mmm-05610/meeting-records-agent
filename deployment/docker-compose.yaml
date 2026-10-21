@@ -1,0 +1,135 @@
+# Target deployment form for meeting-records-agent v0.1.
+#
+# STATUS: delivery artifact. This host has no usable Docker daemon (sudo requires an
+# interactive password), so the verified v0.1 chain runs in native mode
+# (scripts/native/*.sh). This file mirrors that topology for machines with Docker:
+# web + agent + rag + one PostgreSQL instance with two databases.
+#
+#   docker compose -f deployment/docker-compose.yaml --env-file deployment/env/local.env up -d --build
+#
+# Only the web port is published, and only on loopback.
+name: meeting-records-agent
+
+volumes:
+  pgdata:
+    name: mra_pgdata
+  rag_files:
+    name: mra_rag_files
+  model_cache:
+    name: mra_model_cache
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?set POSTGRES_SUPERUSER_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/init-databases.sql:/docker-entrypoint-initdb.d/01-init-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  model-gateway:
+    build:
+      context: ../services/model-gateway
+    environment:
+      GATEWAY_PORT: "8081"
+      GATEWAY_UPSTREAM_BASE: ${GATEWAY_UPSTREAM_BASE:-https://opencode.ai/zen/go/v1}
+      GATEWAY_UPSTREAM_KEY: ${OPENCODE_GO_API_KEY:?set OPENCODE_GO_API_KEY}
+      GATEWAY_EMBEDDING_MODEL: ${GATEWAY_EMBEDDING_MODEL:-BAAI/bge-small-zh-v1.5}
+      GATEWAY_EMBEDDING_DIM: "512"
+      HF_HOME: /models/hf
+    volumes:
+      - model_cache:/models
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8081/healthz')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  rag:
+    build:
+      context: ../apps/rag/py
+    environment:
+      R2R_HOST: 0.0.0.0
+      R2R_PORT: "7272"
+      R2R_PROJECT_NAME: meeting_records_agent
+      R2R_CONFIG_PATH: /app/config/meeting_records.toml
+      R2R_USER_TOOLS_PATH: /app/user_tools
+      R2R_POSTGRES_USER: rag_app
+      R2R_POSTGRES_PASSWORD: ${RAG_DB_PASSWORD:?set RAG_DB_PASSWORD}
+      R2R_POSTGRES_HOST: postgres
+      R2R_POSTGRES_PORT: "5432"
+      R2R_POSTGRES_DBNAME: rag_db
+      R2R_SECRET_KEY: ${R2R_SECRET_KEY:?set R2R_SECRET_KEY}
+      R2R_ADMIN_EMAIL: ${R2R_ADMIN_EMAIL:-owner@meeting-records.local}
+      R2R_ADMIN_PASSWORD: ${R2R_ADMIN_PASSWORD:?set R2R_ADMIN_PASSWORD}
+      OPENAI_API_KEY: local-gateway
+      OPENAI_API_BASE: http://model-gateway:8081/v1
+      LITELLM_DROP_PARAMS: "True"
+    volumes:
+      - rag_files:/app/files
+    depends_on:
+      postgres:
+        condition: service_healthy
+      model-gateway:
+        condition: service_healthy
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: ../apps/agent
+      dockerfile: docker/Dockerfile.service
+    environment:
+      HOST: 0.0.0.0
+      PORT: "8080"
+      DEFAULT_MODEL: openai-compatible
+      COMPATIBLE_BASE_URL: http://model-gateway:8081/v1
+      COMPATIBLE_API_KEY: local-gateway
+      COMPATIBLE_MODEL: ${COMPATIBLE_MODEL:-minimax-m3.1-flash-free}
+      DATABASE_TYPE: postgres
+      POSTGRES_USER: agent_app
+      POSTGRES_PASSWORD: ${AGENT_DB_PASSWORD:?set AGENT_DB_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: agent_db
+      R2R_BASE_URL: http://rag:7272
+      R2R_SERVICE_EMAIL: ${R2R_ADMIN_EMAIL:-owner@meeting-records.local}
+      R2R_SERVICE_PASSWORD: ${R2R_ADMIN_PASSWORD:?set R2R_ADMIN_PASSWORD}
+      MEETING_RERANK_BACKEND: fastembed
+      MEETING_RERANK_CACHE_DIR: /models/flashrank
+      HF_HOME: /models/hf
+    volumes:
+      - model_cache:/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rag:
+        condition: service_started
+      model-gateway:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../apps/web
+    environment:
+      R2R_API_URL: http://rag:7272
+      AGENT_API_URL: http://agent:8080
+      R2R_ADMIN_EMAIL: ${R2R_ADMIN_EMAIL:-owner@meeting-records.local}
+      R2R_ADMIN_PASSWORD: ${R2R_ADMIN_PASSWORD:?set R2R_ADMIN_PASSWORD}
+      MRA_SESSION_SECRET: ${MRA_SESSION_SECRET:?set MRA_SESSION_SECRET}
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - agent
+      - rag
+    restart: unless-stopped
+

@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-10-21T19:24:59.289Z",
+  "base_url": "http://127.0.0.1:3000",
+  "passed": 11,
+  "failed": 1,
+  "results": [
+    {
+      "name": "登录成功并离开登录页",
+      "ok": true,
+      "detail": "http://127.0.0.1:3000/"
+    },
+    {
+      "name": "登录页无注册入口",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "会议页显示真实项目",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "会议列表显示真实会议与就绪状态",
+      "ok": true,
+      "detail": "ready badges=7"
+    },
+    {
+      "name": "真实 UI 上传中文会议并出现在列表",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "删除会议后列表不再显示",
+      "ok": true,
+      "detail": "remaining=0"
+    },
+    {
+      "name": "决定类问题返回已完成答案",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "答案包含最终确认的混合检索方案",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "答案说明最新建议不覆盖确认",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "答案渲染可点击编号引用",
+      "ok": false,
+      "detail": "citations=0"
+    },
+    {
+      "name": "追问得到基于历史的回答",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "刷新后恢复历史答案与引用",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

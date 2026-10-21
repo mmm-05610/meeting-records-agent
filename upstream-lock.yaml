@@ -2,7 +2,10 @@
 schema_version: 1
 project: meeting-records-agent
 design_revision: D0.1-r1
-status: planned
+imported_at: "2026-10-22"
+reference_examples_local_only: true
+patch_log: docs/upstream/patches.md
+status: imported_local_native_mode
 
 repositories:
   agent:

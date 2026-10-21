@@ -1,0 +1,67 @@
+{
+  "package": "IP-v0.1",
+  "revision": "r1",
+  "source_commit": "7e3645775d67e39522c9ef0808661ff9f7b839f0",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "f092b3bc9e37191a507883fc8fb81dcb82159791e06c40b867523a9e2bcba60e"
+    },
+    {
+      "path": "acceptance/checklist.md",
+      "sha256": "b11e3f14b87792e71b84f49fe491dacf16344ddf462c03c35ceee397bfa4548c"
+    },
+    {
+      "path": "acceptance/evaluation.md",
+      "sha256": "f6c3a3f64d8cb1a7ec92b4e667ce6035073d8bc5f3c1e39f0ecd8e55a2b6bfaa"
+    },
+    {
+      "path": "baseline.md",
+      "sha256": "a4b598a0b434d4e8d458b3648c2c3fdbefcb317c28533442a199dd2829e6533d"
+    },
+    {
+      "path": "change-map.md",
+      "sha256": "4562ec8c12c92cf5c8360aaa7e9e54093e8d6d00bc1f61d687d8d97a80952e0d"
+    },
+    {
+      "path": "contracts/interfaces.md",
+      "sha256": "10789dba5ef8b41b63f188917268b7c632498da29679e90eb7a38faf9abe7fc0"
+    },
+    {
+      "path": "design/architecture.md",
+      "sha256": "e9d164551212da7bdfe1d55fe69b82e496c33850d7e57b9df0b1d3d5aaa0add9"
+    },
+    {
+      "path": "design/modules.md",
+      "sha256": "805c4187e5d032dd80ce53cbd3913b4549eee1e4078ab57ab298aa37c3f84b79"
+    },
+    {
+      "path": "dsh-goal.md",
+      "sha256": "5af9e75c5d70ee8a2a1c661e4042a16a214275ab9132354c38ea5727bd2605db"
+    },
+    {
+      "path": "operations/resume.md",
+      "sha256": "82797a2509b5be8869bd3ad1997f7db4e1add35e1e9abecd84d1a4786c35c7ed"
+    },
+    {
+      "path": "plan.md",
+      "sha256": "360d628eb68d473a1b947523ccbabe3fe5bcd9c83ca61d188f57202e1bb8f4ce"
+    },
+    {
+      "path": "review.md",
+      "sha256": "283391e2d00fa38526c7b8b27d873c00c032e28caeccb04b5035f6f8c85b49cc"
+    },
+    {
+      "path": "spec.md",
+      "sha256": "f9b40451f59d3d739f8d0145fa41116b33bfa7c8965be1afa6b3869c39510e6f"
+    },
+    {
+      "path": "task-graph.json",
+      "sha256": "5412a17698caf2555a66de34c3e909b1ebc52b8385b57e21b8ed1df9be5f3cc8"
+    },
+    {
+      "path": "tasks.md",
+      "sha256": "11f19131c3716b6c99d28a9478b9d838a93266a76549abda3619af0f90f9aece"
+    }
+  ]
+}

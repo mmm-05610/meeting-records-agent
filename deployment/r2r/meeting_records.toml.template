@@ -1,0 +1,46 @@
+# R2R configuration for meeting-records-agent v0.1.
+# Merged on top of the upstream defaults in apps/rag/py/r2r/r2r.toml.
+# Only the differences needed by this product are listed here.
+
+[app]
+project_name = "meeting_records_agent"
+# Product never asks R2R to generate prose; internal LLM calls are off/cheap.
+default_max_documents_per_user = 10000
+fast_llm = "openai/minimax-m3.1-flash-free"
+quality_llm = "openai/minimax-m3.1-flash-free"
+
+[auth]
+provider = "r2r"
+require_authentication = true
+require_email_verification = false
+# Single local account; registration stays closed in the Web UI and is disabled at the API.
+default_admin_email = "${R2R_ADMIN_EMAIL}"
+default_admin_password = "${R2R_ADMIN_PASSWORD}"
+
+[completion]
+provider = "litellm"
+concurrent_request_limit = 8
+
+[embedding]
+provider = "litellm"
+base_model = "openai/text-embedding-3-small"
+base_dimension = 512
+batch_size = 16
+
+[completion_embedding]
+provider = "litellm"
+base_model = "openai/text-embedding-3-small"
+base_dimension = 512
+batch_size = 16
+
+[ingestion]
+provider = "r2r"
+chunking_strategy = "recursive"
+# Paragraph-level chunks keep citations precise enough to jump to the exact passage
+# (C03 baseline 800/120 reduced after measuring real meeting files).
+chunk_size = 300
+chunk_overlap = 60
+excluded_parsers = []
+automatic_extraction = false
+# Product owns answer synthesis; R2R must not summarise documents at ingest time.
+skip_document_summary = true

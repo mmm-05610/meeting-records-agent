@@ -59,3 +59,13 @@ cd meeting-records-agent
 ## 版本与许可
 
 上游固定到已研究的提交，具体采用方式见 [来源记录](docs/upstream.md)。这些项目当前尚未复制进本仓库；引入时须保留适用的许可证、版权声明和修改记录，并核对示例、资源与模型权重的独立条款。本项目自身许可尚未确定。
+
+## 实施包与 dsh 执行入口
+
+第一版实施包位于 [specs/001-v0.1](specs/001-v0.1/README.md)，包含详细架构、模块与接口设计、25 项带依赖的开发任务、24 条最终验收和夜间恢复规程。当前仅完成设计文档，任务和产品验收均未执行。
+
+- [架构与模块](specs/001-v0.1/design/architecture.md) · [模块详细设计](specs/001-v0.1/design/modules.md) · [接口契约](specs/001-v0.1/contracts/interfaces.md)
+- [任务与依赖图](specs/001-v0.1/tasks.md) · [最终验收](specs/001-v0.1/acceptance/checklist.md)
+- [完整 dsh /goal](specs/001-v0.1/dsh-goal.md) · [北京时间 01:30–09:30 恢复检查](specs/001-v0.1/operations/resume.md)
+
+在仓库根目录发起执行者；运行状态与调度回执留在被忽略的 `.run/`，不提交到公开仓库。

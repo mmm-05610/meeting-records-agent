@@ -1,0 +1,41 @@
+{
+  "_说明": [
+    "由 data/imports/*.json 生成的真实映射（2026-10-22 导入）",
+    "document_id 来自 C01 确定性身份规则"
+  ],
+  "projects": {
+    "模拟项目A：星河笔记": {
+      "collection_id": "6bc3e8ca-8806-4cad-b838-3cdf3ea694cb",
+      "documents": {
+        "sim-project-a/meeting-01.md": "74a4b1b7-1de3-5793-a87f-6c6da61f9bec",
+        "sim-project-a/meeting-02.md": "8725b286-66cd-5ad3-b2de-bb0b7969efd7",
+        "sim-project-a/meeting-03.md": "c5712bfe-1590-5c8e-bd6b-a0948b23e2e3",
+        "sim-project-a/meeting-04.md": "a5b572f4-fc44-55d3-8c69-f842ecf6a8c3",
+        "sim-project-a/meeting-05.md": "fabfcb9d-fa08-573a-808f-96ae2159ec9d",
+        "sim-project-a/meeting-06.md": "76eac640-e0cf-57f2-822c-b9d6eebd7839"
+      }
+    },
+    "模拟项目B：云仓物流": {
+      "collection_id": "7d247a4b-6291-447f-b435-d730f1889d54",
+      "documents": {
+        "sim-project-b/meeting-01.md": "d9b0e948-8b89-5832-9d87-e76e64dd2782",
+        "sim-project-b/meeting-02.md": "79e5e27c-0d0a-533a-a15f-49b4b217fa88",
+        "sim-project-b/meeting-03.md": "b99d5816-fa27-5629-a9b4-da6dde2f0460",
+        "sim-project-b/meeting-04.md": "60df2139-87aa-58ba-977d-9b112e0aa3f8",
+        "sim-project-b/meeting-05.md": "d031cbb8-d637-5f22-9aa4-bd48db419f55",
+        "sim-project-b/meeting-06.md": "9b3d5c0a-1fc0-532f-b8f8-15b4a099b78f"
+      }
+    },
+    "模拟项目C：青禾医疗": {
+      "collection_id": "25692e18-b5e6-4e35-ad2c-0b8cdd075ba6",
+      "documents": {
+        "sim-project-c/meeting-01.md": "7df14625-53d7-541b-bec7-bcef64b1f099",
+        "sim-project-c/meeting-02.md": "4398413c-d143-58e3-a366-af8eea569375",
+        "sim-project-c/meeting-03.md": "2d764550-bd01-51a6-afaa-8178bb7fe6d9",
+        "sim-project-c/meeting-04.md": "67b5400f-7583-5f69-b53f-2a9f3ebf9de7",
+        "sim-project-c/meeting-05.md": "5d60137b-38c4-519b-8eb8-1d813728dbcd",
+        "sim-project-c/meeting-06.md": "4780c785-b8ee-5ade-86b2-77a7c71fa9a1"
+      }
+    }
+  }
+}

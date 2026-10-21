@@ -1,0 +1,71 @@
+{
+  "passed": 13,
+  "failed": 0,
+  "results": [
+    {
+      "name": "登录获得 HttpOnly 会话",
+      "ok": true,
+      "detail": "mra_session"
+    },
+    {
+      "name": "未登录访问项目列表被拒绝",
+      "ok": true,
+      "detail": "401"
+    },
+    {
+      "name": "不存在注册入口（404）",
+      "ok": true,
+      "detail": "404"
+    },
+    {
+      "name": "登录后可读项目列表",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "跨项目显式范围被拒绝",
+      "ok": true,
+      "detail": "http=200 category=scope_forbidden answer=False"
+    },
+    {
+      "name": "伪造 user_id 被拒绝",
+      "ok": true,
+      "detail": "400"
+    },
+    {
+      "name": "空显式范围被拒绝",
+      "ok": true,
+      "detail": "category=input_error"
+    },
+    {
+      "name": "未知项目范围被拒绝",
+      "ok": true,
+      "detail": "category=input_error"
+    },
+    {
+      "name": "空文件上传被拒绝",
+      "ok": true,
+      "detail": "400"
+    },
+    {
+      "name": "缺少标题上传被拒绝",
+      "ok": true,
+      "detail": "400"
+    },
+    {
+      "name": "非法日期上传被拒绝",
+      "ok": true,
+      "detail": "400"
+    },
+    {
+      "name": "不存在的会议分块返回 404",
+      "ok": true,
+      "detail": "404"
+    },
+    {
+      "name": "删除不存在的会议返回失败",
+      "ok": true,
+      "detail": "404"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "_说明": [
+    "示例映射文件：把三个模拟项目映射到真实的 collection_id 与 18 份会议的真实 document_id。",
+    "下面的 UUID 是占位符，集成时必须替换为真实值：collection_id 取产品里创建的项目 ID；",
+    "document_id 按契约 C01 的 uuid5 规则计算（<collection_id>|<meeting_date>|<NFC 标题>|<record_kind>|<content_sha256>），",
+    "也可以在导入完成后从产品返回的文档身份直接读取。",
+    "用法：python3 evals/run_eval.py --scope-map evals/datasets/scope-map.json"
+  ],
+  "projects": {
+    "模拟项目A：星河笔记": {
+      "collection_id": "00000000-0000-4000-8000-00000000000a",
+      "documents": {
+        "sim-project-a/meeting-01.md": "00000000-0000-4000-8000-000000000101",
+        "sim-project-a/meeting-02.md": "00000000-0000-4000-8000-000000000102",
+        "sim-project-a/meeting-03.md": "00000000-0000-4000-8000-000000000103",
+        "sim-project-a/meeting-04.md": "00000000-0000-4000-8000-000000000104",
+        "sim-project-a/meeting-05.md": "00000000-0000-4000-8000-000000000105",
+        "sim-project-a/meeting-06.md": "00000000-0000-4000-8000-000000000106"
+      }
+    },
+    "模拟项目B：云仓物流": {
+      "collection_id": "00000000-0000-4000-8000-00000000000b",
+      "documents": {
+        "sim-project-b/meeting-01.md": "00000000-0000-4000-8000-000000000201",
+        "sim-project-b/meeting-02.md": "00000000-0000-4000-8000-000000000202",
+        "sim-project-b/meeting-03.md": "00000000-0000-4000-8000-000000000203",
+        "sim-project-b/meeting-04.md": "00000000-0000-4000-8000-000000000204",
+        "sim-project-b/meeting-05.md": "00000000-0000-4000-8000-000000000205",
+        "sim-project-b/meeting-06.md": "00000000-0000-4000-8000-000000000206"
+      }
+    },
+    "模拟项目C：青禾医疗": {
+      "collection_id": "00000000-0000-4000-8000-00000000000c",
+      "documents": {
+        "sim-project-c/meeting-01.md": "00000000-0000-4000-8000-000000000301",
+        "sim-project-c/meeting-02.md": "00000000-0000-4000-8000-000000000302",
+        "sim-project-c/meeting-03.md": "00000000-0000-4000-8000-000000000303",
+        "sim-project-c/meeting-04.md": "00000000-0000-4000-8000-000000000304",
+        "sim-project-c/meeting-05.md": "00000000-0000-4000-8000-000000000305",
+        "sim-project-c/meeting-06.md": "00000000-0000-4000-8000-000000000306"
+      }
+    }
+  }
+}

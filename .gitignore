@@ -53,3 +53,18 @@ coverage/
 !/evals/results/README.md
 
 # Keep dependency lock files tracked once implementation begins.
+
+# Local development goal state and scheduler receipts
+/.run/
+
+# Native toolchain and caches (no Docker required)
+/.local/
+/upstream/
+/services/model-gateway/.venv/
+
+# Local runtime state
+/data/
+/.run/
+
+# pnpm local store
+/.pnpm-store/

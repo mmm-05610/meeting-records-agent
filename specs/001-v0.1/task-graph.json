@@ -1,0 +1,224 @@
+{
+  "derived_from": "tasks.md",
+  "revision": "IP-v0.1-r1",
+  "execution_status_included": false,
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "初始化与建立夜间恢复检查",
+      "depends_on": [],
+      "owner": "I"
+    },
+    {
+      "id": "T002",
+      "title": "引入固定上游与建立依赖基线",
+      "depends_on": [
+        "T001"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T003",
+      "title": "固定接口、状态和跨端类型",
+      "depends_on": [
+        "T002"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T004",
+      "title": "部署、配置与双库装配",
+      "depends_on": [
+        "T003"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T005",
+      "title": "会议入库与项目归属",
+      "depends_on": [
+        "T003"
+      ],
+      "owner": "R"
+    },
+    {
+      "id": "T006",
+      "title": "原件清理与删除一致性",
+      "depends_on": [
+        "T005"
+      ],
+      "owner": "R"
+    },
+    {
+      "id": "T007",
+      "title": "Agent 入口与身份范围边界",
+      "depends_on": [
+        "T003"
+      ],
+      "owner": "A"
+    },
+    {
+      "id": "T008",
+      "title": "R2R HTTP 检索与重排工具",
+      "depends_on": [
+        "T003"
+      ],
+      "owner": "B"
+    },
+    {
+      "id": "T009",
+      "title": "持久状态与历史响应",
+      "depends_on": [
+        "T007"
+      ],
+      "owner": "A"
+    },
+    {
+      "id": "T010",
+      "title": "事实问答与引用完成流程",
+      "depends_on": [
+        "T008",
+        "T009"
+      ],
+      "owner": "B"
+    },
+    {
+      "id": "T011",
+      "title": "完整会议核对与决定归并",
+      "depends_on": [
+        "T010"
+      ],
+      "owner": "B"
+    },
+    {
+      "id": "T012",
+      "title": "Web 登录与同源服务适配",
+      "depends_on": [
+        "T003"
+      ],
+      "owner": "W1"
+    },
+    {
+      "id": "T013",
+      "title": "会议列表与上传交互",
+      "depends_on": [
+        "T003"
+      ],
+      "owner": "W2"
+    },
+    {
+      "id": "T014",
+      "title": "聊天、引用与历史 UI",
+      "depends_on": [
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "owner": "W2"
+    },
+    {
+      "id": "T015",
+      "title": "真实导入纵向联调",
+      "depends_on": [
+        "T004",
+        "T005",
+        "T007",
+        "T012",
+        "T013"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T016",
+      "title": "真实事实问答与引用联调",
+      "depends_on": [
+        "T008",
+        "T010",
+        "T014",
+        "T015"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T017",
+      "title": "决定和变更纵向联调",
+      "depends_on": [
+        "T011",
+        "T016"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T018",
+      "title": "构造模拟会议与冻结题集",
+      "depends_on": [
+        "T003"
+      ],
+      "owner": "E"
+    },
+    {
+      "id": "T019",
+      "title": "复用 Ragas 评测执行链",
+      "depends_on": [
+        "T018"
+      ],
+      "owner": "E"
+    },
+    {
+      "id": "T020",
+      "title": "重启、删除与数据恢复联调",
+      "depends_on": [
+        "T006",
+        "T009",
+        "T014",
+        "T017"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T021",
+      "title": "故障、注入与边界回归",
+      "depends_on": [
+        "T020"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T022",
+      "title": "真实中文模型与冻结评测",
+      "depends_on": [
+        "T017",
+        "T019",
+        "T021"
+      ],
+      "owner": "E"
+    },
+    {
+      "id": "T023",
+      "title": "全新环境安装与使用文档",
+      "depends_on": [
+        "T022",
+        "T020",
+        "T021"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T024",
+      "title": "逐项最终验收与交付审阅",
+      "depends_on": [
+        "T023",
+        "T001"
+      ],
+      "owner": "I"
+    },
+    {
+      "id": "T025",
+      "title": "交付第一版与清理恢复任务",
+      "depends_on": [
+        "T024"
+      ],
+      "owner": "I"
+    }
+  ]
+}

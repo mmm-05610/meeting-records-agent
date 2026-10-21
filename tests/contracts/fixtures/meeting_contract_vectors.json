@@ -1,0 +1,132 @@
+{
+  "answer_record_case": {
+    "claims": [
+      {
+        "evidence_ids": [
+          "e1"
+        ],
+        "kind": "confirmed",
+        "text": "第一版采用 PostgreSQL + pgvector。"
+      }
+    ],
+    "coverage": {
+      "checked": [
+        "a3c334cb-e50a-5ba6-8289-50fde2ce19d6"
+      ],
+      "failed": [],
+      "unchecked": []
+    },
+    "created_at": "2026-03-11T09:00:00+08:00",
+    "message_id": "msg-1",
+    "model_config_id": "gateway/minimax-m3.1-flash-free",
+    "run_id": "run-1",
+    "scope_snapshot": {
+      "collection_id": "11111111-1111-5111-8111-111111111111",
+      "created_at": "2026-10-22T03:29:37.440653+08:00",
+      "documents": [
+        {
+          "collection_id": "11111111-1111-5111-8111-111111111111",
+          "content_sha256": "9a224ee54e63c5c633d4f6af160a4e4c6ca8dd55e1adaba423456298cdf6ace4",
+          "document_id": "a3c334cb-e50a-5ba6-8289-50fde2ce19d6",
+          "meeting_date": "2026-03-02",
+          "record_kind": null,
+          "status": "ready",
+          "time_precision": "date",
+          "title": "演示项目A 需求评审会"
+        },
+        {
+          "collection_id": "11111111-1111-5111-8111-111111111111",
+          "content_sha256": "2205f8459295e9f53154a11642034c55877457e1c39d10702b1ed9903a5c8d63",
+          "document_id": "ca490ef4-a9ba-55f8-a807-c1c18dca6c23",
+          "meeting_date": "2026-03-16",
+          "record_kind": null,
+          "status": "ready",
+          "time_precision": "date",
+          "title": "演示项目A 变更评审会"
+        }
+      ],
+      "fingerprint": "238ae813babdfa83fe9ad36c9e72cc0f7603fb46f499bcee365362bb6d29159b",
+      "mode": "all_ready"
+    },
+    "sources": {
+      "e1": {
+        "chunk_id": "chunk-0",
+        "chunk_order": 0,
+        "document_id": "a3c334cb-e50a-5ba6-8289-50fde2ce19d6",
+        "meeting_date": "2026-03-02",
+        "quote": "会议明确确认：第一版采用 PostgreSQL 加 pgvector 作为唯一向量存储。",
+        "record_kind": "minutes",
+        "source_key": "e1",
+        "title": "演示项目A 需求评审会"
+      }
+    },
+    "status": "completed",
+    "text": "第一版采用 PostgreSQL + pgvector。"
+  },
+  "document_id_cases": [
+    {
+      "collection_id": "11111111-1111-5111-8111-111111111111",
+      "content_sha256": "9a224ee54e63c5c633d4f6af160a4e4c6ca8dd55e1adaba423456298cdf6ace4",
+      "expected_document_id": "a3c334cb-e50a-5ba6-8289-50fde2ce19d6",
+      "meeting_date": "2026-03-02",
+      "record_kind": "minutes",
+      "title": " 演示项目A  需求评审会 "
+    },
+    {
+      "collection_id": "11111111-1111-5111-8111-111111111111",
+      "content_sha256": "9a224ee54e63c5c633d4f6af160a4e4c6ca8dd55e1adaba423456298cdf6ace4",
+      "expected_document_id": "a3c334cb-e50a-5ba6-8289-50fde2ce19d6",
+      "meeting_date": "2026-03-02",
+      "record_kind": "minutes",
+      "title": "演示项目A 需求评审会"
+    },
+    {
+      "collection_id": "22222222-2222-5222-8222-222222222222",
+      "content_sha256": "9f5d5af48e7f16223ac3324992d973a010c94dcc38d7cf4adcf0e09dc6e41d16",
+      "expected_document_id": "dd71980b-c8ec-5bbb-8a7c-88e70c00c2ca",
+      "meeting_date": "2026-03-09",
+      "record_kind": "transcript",
+      "title": "演示项目B 复盘会"
+    },
+    {
+      "collection_id": "11111111-1111-5111-8111-111111111111",
+      "content_sha256": "2205f8459295e9f53154a11642034c55877457e1c39d10702b1ed9903a5c8d63",
+      "expected_document_id": "ca490ef4-a9ba-55f8-a807-c1c18dca6c23",
+      "meeting_date": "2026-03-16",
+      "record_kind": "transcript",
+      "title": "演示项目A 变更评审会"
+    }
+  ],
+  "schema_version": "meeting-v0.1",
+  "scope_snapshot_case": {
+    "expected_fingerprint": "238ae813babdfa83fe9ad36c9e72cc0f7603fb46f499bcee365362bb6d29159b",
+    "snapshot": {
+      "collection_id": "11111111-1111-5111-8111-111111111111",
+      "created_at": "2026-10-22T03:29:37.440653+08:00",
+      "documents": [
+        {
+          "collection_id": "11111111-1111-5111-8111-111111111111",
+          "content_sha256": "9a224ee54e63c5c633d4f6af160a4e4c6ca8dd55e1adaba423456298cdf6ace4",
+          "document_id": "a3c334cb-e50a-5ba6-8289-50fde2ce19d6",
+          "meeting_date": "2026-03-02",
+          "record_kind": null,
+          "status": "ready",
+          "time_precision": "date",
+          "title": "演示项目A 需求评审会"
+        },
+        {
+          "collection_id": "11111111-1111-5111-8111-111111111111",
+          "content_sha256": "2205f8459295e9f53154a11642034c55877457e1c39d10702b1ed9903a5c8d63",
+          "document_id": "ca490ef4-a9ba-55f8-a807-c1c18dca6c23",
+          "meeting_date": "2026-03-16",
+          "record_kind": null,
+          "status": "ready",
+          "time_precision": "date",
+          "title": "演示项目A 变更评审会"
+        }
+      ],
+      "fingerprint": "238ae813babdfa83fe9ad36c9e72cc0f7603fb46f499bcee365362bb6d29159b",
+      "mode": "all_ready"
+    }
+  }
+}
