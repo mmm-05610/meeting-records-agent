@@ -1,0 +1,58 @@
+# Design provenance only. No source code or dependencies are installed yet.
+schema_version: 1
+project: meeting-records-agent
+design_revision: D0.1-r1
+status: planned
+
+repositories:
+  agent:
+    url: https://github.com/JoshuaC215/agent-service-toolkit
+    commit: 0eb5820a1d689743ac834102030f53f4a21dc321
+    target: apps/agent
+    adoption: fork
+    root_license: MIT
+  rag:
+    url: https://github.com/SciPhi-AI/R2R
+    commit: 9c5a94d151f90876bd7eb860f300a8fd662dc481
+    target: apps/rag
+    adoption: fork
+    root_license: MIT
+  web:
+    url: https://github.com/SciPhi-AI/R2R-Application
+    commit: c4612ab48af002d4cd078659d11db88ed61d53b8
+    target: apps/web
+    adoption: fork
+    root_license: MIT
+  copilotkit_example:
+    url: https://github.com/CopilotKit/CopilotKit
+    commit: abc6807f35865e043c498398e3080f137ddbdad9
+    source_path: examples/integrations/langgraph-fastapi
+    target: apps/web
+    adoption: example_adaptation
+    root_license: MIT
+  ragas_examples:
+    url: https://github.com/vibrantlabsai/ragas
+    commit: 298b68274234c060deacab3cf5fb52aa3a20e885
+    source_path: examples
+    target: evals
+    adoption: example_adaptation
+    root_license: Apache-2.0
+    license_note: Check and retain the examples-specific license before copying.
+
+packages:
+  langchain-community:
+    research_version: "0.4.2"
+    component: FlashrankRerank
+    adoption: dependency
+    license: MIT
+  FlashRank:
+    research_version: "0.2.10"
+    adoption: dependency
+    license: Apache-2.0
+
+unresolved:
+  - Application dependency lock files and any necessary compatibility patches.
+  - Generation and embedding model names, versions and embedding dimensions.
+  - Reranking model revision, license and Chinese evaluation results.
+  - LangSmith SDK version and opt-in tracing configuration.
+  - Project license and file-level notices when upstream code is introduced.

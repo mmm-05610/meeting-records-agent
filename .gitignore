@@ -1,0 +1,55 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Local agent/editor state
+.agents/
+.codex/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Python environments and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+
+# JavaScript dependencies and builds
+node_modules/
+.next/
+.turbo/
+*.tsbuildinfo
+dist/
+build/
+coverage/
+
+# Runtime data, local research and generated evaluation outputs
+/data/
+/uploads/
+/backups/
+/validation/
+/tmp/
+/logs/
+*.log
+*.sqlite
+*.sqlite3
+/evals/results/*
+!/evals/results/README.md
+
+# Keep dependency lock files tracked once implementation begins.
