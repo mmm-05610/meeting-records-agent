@@ -146,7 +146,9 @@ export function sessionCookieOptions(maxAgeSeconds: number) {
     httpOnly: true,
     path: '/',
     sameSite: 'lax' as const,
-    secure: isProduction(),
+    // Loopback HTTP is the documented local deployment; only mark the cookie Secure
+    // when an operator explicitly terminates TLS (or runs in production behind TLS).
+    secure: process.env.MRA_COOKIE_SECURE === 'true',
     maxAge: maxAgeSeconds,
   };
 }

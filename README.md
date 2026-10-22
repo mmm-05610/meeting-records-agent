@@ -2,7 +2,8 @@
 
 会议记录问答助手：导入一个项目的多次会议记录，查清“最后怎么定的、谁负责、为什么改了”，并通过引用核对原文。
 
-**当前状态：设计与仓库初始化。** 本仓库已保存 v0.1 详细设计及上游选型，尚未引入应用源码、安装依赖或完成可运行产品。下述功能和架构是开发目标。
+**当前状态：v0.1 已实现并在本机真实链路验证。** 三个应用基于固定上游二次开发，可在本机安装、导入中文会议记录、跨会议问答并逐项核对引用；评测、验收证据与已知限制见
+[docs/evidence/v0.1-acceptance.md](docs/evidence/v0.1-acceptance.md) 与 [docs/evidence/evaluation-summary.md](docs/evidence/evaluation-summary.md)。
 
 ## v0.1 要做什么
 
@@ -39,14 +40,21 @@
 
 ## 当前怎么使用
 
-目前可以克隆仓库并阅读设计文档：
-
 ```bash
 git clone https://github.com/mmm-05610/meeting-records-agent.git
 cd meeting-records-agent
+cp .env.example .env         # 填入 OPENCODE_GO_API_KEY 等
+bash scripts/native/install-postgres.sh
+bash scripts/native/init-db.sh
+# 依赖安装与启动见 docs/usage/install.md
 ```
 
-应用安装命令将在运行与导入闭环完成后提供。设计中的 Compose 命令属于目标交付形式；当前仓库没有应用源码、Compose 文件或可执行演示。
+- 安装/配置/启动/停止/备份恢复：[docs/usage/install.md](docs/usage/install.md)、[docs/usage/operations.md](docs/usage/operations.md)
+- 三份演示记录与体验步骤：[docs/usage/demo.md](docs/usage/demo.md)
+- 交付形态的 Compose（本机无 Docker 守护进程，未实跑）：[deployment/docker-compose.yaml](deployment/docker-compose.yaml)
+
+本机实际验证的是 native 模式（PostgreSQL 18 + pgvector、模型网关、R2R、Agent、Web 五个进程）；
+Web 仅监听 `127.0.0.1:3000`，登录使用本地单账号。
 
 ## 实施顺序
 
@@ -58,11 +66,14 @@ cd meeting-records-agent
 
 ## 版本与许可
 
-上游固定到已研究的提交，具体采用方式见 [来源记录](docs/upstream.md)。这些项目当前尚未复制进本仓库；引入时须保留适用的许可证、版权声明和修改记录，并核对示例、资源与模型权重的独立条款。本项目自身许可尚未确定。
+上游固定到已研究的提交，实际引入方式、许可与修改记录见 [来源记录](docs/upstream.md) 与
+[补丁记录](docs/upstream/patches.md)。三个二开目录保留各自 MIT 许可；本项目自身以 MIT 许可发布
+（见 [LICENSE](LICENSE)），模拟评测数据与结果仅用于本地验证。
 
 ## 实施包与 dsh 执行入口
 
-第一版实施包位于 [specs/001-v0.1](specs/001-v0.1/README.md)，包含详细架构、模块与接口设计、25 项带依赖的开发任务、24 条最终验收和夜间恢复规程。当前仅完成设计文档，任务和产品验收均未执行。
+第一版实施包位于 [specs/001-v0.1](specs/001-v0.1/README.md)。执行进展、任务状态与验收结果：
+[docs/evidence/v0.1-acceptance.md](docs/evidence/v0.1-acceptance.md)；夜间恢复调度回执在本地 `.run/v0.1/`（不提交）。
 
 - [架构与模块](specs/001-v0.1/design/architecture.md) · [模块详细设计](specs/001-v0.1/design/modules.md) · [接口契约](specs/001-v0.1/contracts/interfaces.md)
 - [任务与依赖图](specs/001-v0.1/tasks.md) · [最终验收](specs/001-v0.1/acceptance/checklist.md)

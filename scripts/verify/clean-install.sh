@@ -14,11 +14,23 @@ export GATEWAY_PORT=8091
 export PORT=8090
 export WEB_PORT=3001
 
+echo "== 0. stop leftovers from an earlier attempt =="
+if [ -d "$TARGET/apps/agent/.venv" ]; then
+  (cd "$TARGET" && for svc in web agent r2r gateway; do bash scripts/native/service.sh stop "$svc" >/dev/null 2>&1 || true; done)
+fi
+if [ -d "$TARGET/data/pg" ]; then
+  (source "$TARGET/scripts/native/pg-env.sh" && pg_ctl -D "$PGDATA" stop >/dev/null 2>&1 || true)
+fi
+
 echo "== 1. clean clone from $SOURCE =="
 rm -rf "$TARGET"
 git clone -q "$SOURCE" "$TARGET"
 cd "$TARGET"
 export ROOT="$TARGET"
+# Normalise the proxy environment (httpx rejects socks:// URLs from ALL_PROXY).
+unset ALL_PROXY all_proxy
+export NO_PROXY="localhost,127.0.0.1"
+export no_proxy="$NO_PROXY"
 echo "commit: $(git rev-parse --short HEAD)"
 
 echo "== 2. configuration from .env.example (generated local secrets) =="

@@ -162,6 +162,7 @@ def normalize_sources(raw: Any) -> list[dict]:
                 "title": item.get("title"),
                 "meeting_date": item.get("meeting_date"),
                 "quote": quote,
+                "display_index": item.get("display_index"),
             }
         )
     return sources
@@ -442,7 +443,13 @@ def citation_checks(case: dict, citations: list[dict], scope: dict, scope_map: d
     else:
         presence_required = True
 
-    dangling = sorted(ref for ref in references if keys and ref not in keys)
+    # [n] numbers map to the returned sources by display_index, or by list order.
+    number_to_key: dict[str, str] = {}
+    for index, citation in enumerate(citations, 1):
+        display = citation.get("display_index")
+        number = str(display) if isinstance(display, int) else str(index)
+        number_to_key[number] = str(citation.get("source_key"))
+    dangling = sorted(ref for ref in references if keys and ref not in number_to_key)
     dangling_unknown = sorted(ref for ref in references if not keys and ref)
 
     scope_ids = set(scope.get("document_ids") or [])
