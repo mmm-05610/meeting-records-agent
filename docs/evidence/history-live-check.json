@@ -1,0 +1,26 @@
+{
+  "thread": "restart-1792632748",
+  "messages": 9,
+  "roles": [
+    "user",
+    "assistant",
+    "assistant",
+    "user",
+    "assistant",
+    "user",
+    "assistant",
+    "user",
+    "assistant"
+  ],
+  "records": 2,
+  "record_ids_unique": true,
+  "paired_by_message_id": [
+    "0daf0cb3-eb1c-492c-beb7-72c67c90475e"
+  ],
+  "legacy_text_pairable": [
+    {
+      "record": "6ea7041b-5788-4175-bf0d-a35c9620fdc2",
+      "exact_text_messages": 2
+    }
+  ]
+}

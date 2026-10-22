@@ -1,0 +1,37 @@
+{
+  "thread": "restart-1792632748",
+  "passed": 6,
+  "failed": 0,
+  "results": [
+    {
+      "name": "历史线程按角色显示用户问题",
+      "ok": true,
+      "detail": "occurrences=7"
+    },
+    {
+      "name": "成功轮次显示为已完成",
+      "ok": true,
+      "detail": "completed=4"
+    },
+    {
+      "name": "失败/重复轮次不再重复展示整段答案",
+      "ok": true,
+      "detail": "incomplete=0"
+    },
+    {
+      "name": "澄清轮次显示为需要澄清",
+      "ok": true,
+      "detail": "clarification=2"
+    },
+    {
+      "name": "刷新后状态保持一致",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "新会话刷新后仍为已完成",
+      "ok": true,
+      "detail": "completed=4 incomplete=0"
+    }
+  ]
+}
