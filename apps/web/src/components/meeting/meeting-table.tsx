@@ -68,17 +68,35 @@ export function MeetingTable({
               className="grid grid-cols-1 gap-2 p-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] sm:items-start"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-zinc-100">
+                <p
+                  className="truncate text-sm font-medium text-zinc-100"
+                  title={meeting.title}
+                >
                   {meeting.title}
                 </p>
-                <p className="mt-1 truncate text-xs text-zinc-400">
+                <p
+                  className="mt-1 truncate text-xs text-zinc-400"
+                  title={
+                    meeting.participants.length > 0
+                      ? meeting.participants.join('、')
+                      : '参与人：未记录'
+                  }
+                >
                   {meeting.participants.length > 0
                     ? `参与人：${meeting.participants.join('、')}`
                     : '参与人：未记录'}
                 </p>
-                <p className="mt-1 truncate text-[11px] text-zinc-500">
-                  文档 ID：{meeting.document_id}
-                </p>
+                <details className="mt-1">
+                  <summary className="cursor-pointer text-[11px] text-zinc-500 hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-accent-base">
+                    详情
+                  </summary>
+                  <p className="mt-1 break-all font-mono text-[11px] text-zinc-500">
+                    文档 ID：{meeting.document_id}
+                  </p>
+                  <p className="mt-0.5 break-all font-mono text-[11px] text-zinc-500">
+                    内容指纹：{meeting.content_sha256 || '—'}
+                  </p>
+                </details>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">

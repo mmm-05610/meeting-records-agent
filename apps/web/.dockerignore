@@ -1,2 +1,7 @@
 /assets
 node_modules
+.env*
+!.env.local.example
+.next
+coverage
+*.log

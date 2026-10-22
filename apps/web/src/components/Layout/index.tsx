@@ -20,11 +20,13 @@ const Layout: React.FC<Props> = ({
   return (
     <div className="flex flex-col min-h-screen bg-zinc-900">
       <Head>
+        <html lang="zh-CN" />
         <title>
           {pageTitle
             ? `${pageTitle} | ${brandingConfig.deploymentName}`
             : brandingConfig.deploymentName}
         </title>
+        <meta name="description" content={brandingConfig.productTagline} />
       </Head>
       <Navbar />
       <main className="flex-1 flex flex-col overflow-hidden">{children}</main>

@@ -1,111 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { BarChart3 } from 'lucide-react';
+import React from 'react';
 
-import AverageScoreCard from '@/components/AverageScoreCard';
-import DAUCard from '@/components/DAUCard';
-import ErrorsCard from '@/components/ErrorsCard';
 import Layout from '@/components/Layout';
-import LLMCompletionCard from '@/components/LLMCompletionCard';
-import RequestsCard from '@/components/RequestsCard';
-import USMapCard from '@/components/USMapCard';
-import WAUCard from '@/components/WAUCard';
-import WorldMapCard from '@/components/WorldMapCard';
-import { useUserContext } from '@/context/UserContext';
 
-const processLogData = (data: any) => {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-  if (!data || !Array.isArray(data.results) || data.results.length === 0) {
-    console.error('Invalid data structure:', data);
-    return [];
-  }
-
-  const { entries } = data.results[0].entries;
-
-  if (!Array.isArray(entries)) {
-    console.error('Invalid entries structure:', entries);
-    return [];
-  }
-
-  return entries
-    .filter((entry: any) => entry && entry.key === 'completion_record')
-    .map((entry: any) => {
-      try {
-        const value = JSON.parse(entry.value);
-        return {
-          date: new Date(value.timestamp),
-          score: Array.isArray(value.score) ? value.score[0] : value.score,
-        };
-      } catch (error) {
-        console.error('Error parsing entry:', error, entry);
-        return null;
-      }
-    })
-    .filter(
-      (entry): entry is { date: Date; score: number } =>
-        entry !== null &&
-        !isNaN(entry.date.getTime()) &&
-        typeof entry.score === 'number'
-    )
-    .filter((entry) => entry.date >= sevenDaysAgo && entry.date <= now)
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
-};
-
+/**
+ * 用量分析（次级入口）。
+ *
+ * 本机单账号版本不收集用量指标，也不做多租户统计；
+ * 保留该路径只是为了说明「没有这类看板」，避免再出现上游风格的仪表盘。
+ */
 const Analytics: React.FC = () => {
-  const { getClient } = useUserContext();
-  const [scoreData, setScoreData] = useState<
-    Array<{ date: Date; score: number }>
-  >([]);
-
-  const fetchLogs = useCallback(async () => {
-    try {
-      const client = await getClient();
-      if (!client) {
-        throw new Error('Failed to get authenticated client');
-      }
-
-      const data = {};
-      const processedData = processLogData(data);
-      setScoreData(processedData);
-    } catch (error) {
-      console.error('Error fetching logs:', error);
-    }
-  }, [getClient]);
-
-  useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
-
   return (
-    <Layout pageTitle="Analytics">
-      <main className="w-full flex flex-col min-h-screen container">
-        <div className="mt-[5rem] sm:mt-[5rem]">
-          <div className="grid grid-cols-2 gap-6 py-8">
-            <div className="col-span-1">
-              <RequestsCard />
-            </div>
-            <div className="col-span-1">
-              <ErrorsCard />
-            </div>
-            <div className="col-span-1">
-              <AverageScoreCard scoreData={scoreData} />
-            </div>
-            <div className="col-span-1">
-              <USMapCard />
-            </div>
-            <div className="col-span-2">
-              <WorldMapCard />
-            </div>
-            <div className="col-span-1">
-              <DAUCard />
-            </div>
-            <div className="col-span-1">
-              <WAUCard />
-            </div>
-            <div className="col-span-2">
-              <LLMCompletionCard />
-            </div>
-          </div>
+    <Layout pageTitle="用量分析">
+      <main className="w-full flex flex-col container h-screen-[calc(100%-4rem)] overflow-y-auto">
+        <div className="mx-auto w-full max-w-3xl py-8">
+          <header className="mb-6">
+            <h1 className="text-xl font-bold text-white">用量分析</h1>
+            <p className="mt-1 text-sm text-zinc-400">
+              本机单账号版本不收集用量指标，这个页面暂时没有内容。
+            </p>
+          </header>
+
+          <section className="flex items-start gap-3 rounded-md border border-zinc-800 bg-zinc-950/40 p-4">
+            <BarChart3
+              className="mt-0.5 h-5 w-5 shrink-0 text-zinc-500"
+              aria-hidden
+            />
+            <p className="text-xs leading-5 text-zinc-400">
+              回答与引用的核对请在「问答」页完成：展开「查看来源」与「查看核对详情」即可看到每条引用对应的会议原文与覆盖情况。
+            </p>
+          </section>
         </div>
       </main>
     </Layout>

@@ -120,7 +120,7 @@ const CollectionsPage: React.FC = () => {
               href="/documents"
               className="text-sm text-accent-base underline underline-offset-2 hover:text-accent-light focus:outline-none focus:ring-2 focus:ring-accent-base"
             >
-              前往会议管理页面
+              前往会议记录页面
             </Link>
           </div>
 

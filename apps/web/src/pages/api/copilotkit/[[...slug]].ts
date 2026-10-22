@@ -8,6 +8,12 @@
  * - 不透传 RAW 事件、内部提示或任何凭据。
  */
 
+import { LangGraphHttpAgent } from '@copilotkit/runtime/langgraph';
+import {
+  CopilotRuntime,
+  InMemoryAgentRunner,
+  createCopilotRuntimeHandler,
+} from '@copilotkit/runtime/v2';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { agentRunUrl, mapAgentStatus } from '@/server/agent';
@@ -30,6 +36,7 @@ export const config = {
 const IDENTITY_KEYS = ['user_id'];
 const STRIPPED_KEYS = ['configurable', 'sources', 'answer_record'];
 const FORWARDED_WHITELIST = ['meeting_scope', 'model', 'strategy'];
+const RUNTIME_BASE_PATH = '/api/copilotkit';
 const STREAM_TIMEOUT_MS = Number(
   process.env.MRA_AGUI_TIMEOUT_MS || 15 * 60 * 1000
 );
@@ -79,7 +86,7 @@ export default withApiErrors(
         : req.query.slug;
       if (slug === 'info' || slug === undefined) {
         return res.status(200).json({
-          runtimeVersion: 'v1',
+          runtimeVersion: 'copilotkit-runtime-v2',
           langgraph: false,
           agents: {
             'meeting-assistant': {
@@ -87,7 +94,10 @@ export default withApiErrors(
               description: '基于本项目已入库的会议记录回答问题并给出引用。',
             },
           },
-          endpoints: { agent: `${agentApiUrl()}/agui/meeting-assistant/run` },
+          endpoints: {
+            runtime: `${RUNTIME_BASE_PATH}/agent/meeting-assistant/run`,
+            upstreamAgent: `${agentApiUrl()}/agui/meeting-assistant/run`,
+          },
         });
       }
       return res.status(404).json({
@@ -180,10 +190,38 @@ export default withApiErrors(
       forwardedProps: allowedForwarded,
     };
 
+    // Run through the official CopilotKit Runtime (v2): it validates the AG-UI
+    // request, invokes the configured agent and streams AG-UI events back. The
+    // runtime is built per request so the server-confirmed identity header is
+    // bound to this authenticated session only.
+    const runtime = new CopilotRuntime({
+      agents: {
+        'meeting-assistant': new LangGraphHttpAgent({
+          url: agentRunUrl(),
+          headers: { 'x-mra-user': session.uid },
+        }),
+      },
+      runner: new InMemoryAgentRunner(),
+    });
+    const runtimeHandler = createCopilotRuntimeHandler({
+      runtime,
+      basePath: RUNTIME_BASE_PATH,
+    });
+
+    const runtimeRequest = new Request(
+      `http://127.0.0.1${RUNTIME_BASE_PATH}/agent/meeting-assistant/run`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'text/event-stream',
+        },
+        body: JSON.stringify(upstreamBody),
+      }
+    );
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), STREAM_TIMEOUT_MS);
-    // 客户端断开时中止上游；req 的 'close' 在读完请求体后就会触发，
-    // 因此必须监听 res 的 'close' 并判断响应是否已结束。
     res.on('close', () => {
       if (!res.writableEnded) {
         controller.abort();
@@ -192,24 +230,13 @@ export default withApiErrors(
 
     let upstream: Response;
     try {
-      upstream = await fetch(agentRunUrl(), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'text/event-stream',
-          // Identity is injected by the authenticated same-origin layer only.
-          'x-mra-user': session.uid,
-        },
-        body: JSON.stringify(upstreamBody),
-        signal: controller.signal,
-        cache: 'no-store',
-      });
+      upstream = await runtimeHandler(runtimeRequest);
     } catch (error) {
       clearTimeout(timeout);
       throw new ApiError(
         502,
         'service_failure',
-        '无法连接 Agent 服务。',
+        'CopilotKit Runtime 执行失败。',
         [],
         true
       );
@@ -225,16 +252,6 @@ export default withApiErrors(
         payload = null;
       }
       throw mapAgentStatus(upstream.status, payload);
-    }
-
-    // SSE 透传：逐块写出，不缓冲。
-    res.status(200);
-    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache, no-transform');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no');
-    if (typeof res.flushHeaders === 'function') {
-      res.flushHeaders();
     }
 
     const reader = upstream.body.getReader();

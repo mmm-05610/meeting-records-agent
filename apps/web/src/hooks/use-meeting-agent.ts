@@ -33,7 +33,7 @@ import type {
   ScopeSnapshot,
 } from '@/types/meeting-contracts';
 
-export const AGUI_ENDPOINT = '/api/copilotkit';
+export const AGUI_ENDPOINT = '/api/copilotkit/agent/meeting-assistant/run';
 
 export type RunStatus =
   | 'idle'

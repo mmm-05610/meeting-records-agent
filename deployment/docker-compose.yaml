@@ -1,22 +1,22 @@
-# Target deployment form for meeting-records-agent v0.1.
-#
-# STATUS: delivery artifact. This host has no usable Docker daemon (sudo requires an
-# interactive password), so the verified v0.1 chain runs in native mode
-# (scripts/native/*.sh). This file mirrors that topology for machines with Docker:
-# web + agent + rag + one PostgreSQL instance with two databases.
+# Container deployment for meeting-records-agent v0.1.1.
 #
 #   docker compose -f deployment/docker-compose.yaml --env-file deployment/env/local.env up -d --build
+#   (or: podman-compose -f deployment/docker-compose.yaml --env-file deployment/env/local.env up -d --build)
 #
+# Topology: web + agent + rag + one PostgreSQL instance (two databases), plus a thin
+# local model gateway (embeddings + authenticated proxy to the generation endpoint).
 # Only the web port is published, and only on loopback.
-name: meeting-records-agent
+#
+# v0.1.1 fixes: gateway binds 0.0.0.0 inside the network, database init sets real
+# passwords, the R2R config is rendered from the repository template at startup,
+# health checks cover every service, and the web image never receives local .env files.
+name: ${COMPOSE_PROJECT_NAME:-meeting-records-agent}
 
 volumes:
   pgdata:
-    name: mra_pgdata
-  rag_files:
-    name: mra_rag_files
+    name: ${MRA_DATA_VOLUME:-mra_pgdata}
   model_cache:
-    name: mra_model_cache
+    name: ${MRA_MODEL_VOLUME:-mra_model_cache}
 
 services:
   postgres:
@@ -25,33 +25,44 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?set POSTGRES_SUPERUSER_PASSWORD}
       POSTGRES_DB: postgres
+      RAG_DB_PASSWORD: ${RAG_DB_PASSWORD:?set RAG_DB_PASSWORD}
+      AGENT_DB_PASSWORD: ${AGENT_DB_PASSWORD:?set AGENT_DB_PASSWORD}
+      # Explicit: non-loopback connections must use password auth.
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./postgres/init-databases.sql:/docker-entrypoint-initdb.d/01-init-databases.sql:ro
+      - ./postgres/init-databases.sh:/docker-entrypoint-initdb.d/01-init-databases.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rag_db"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 30
     restart: unless-stopped
 
   model-gateway:
     build:
       context: ../services/model-gateway
     environment:
+      # Must bind all interfaces inside the container network (v0.1.1 fix).
+      GATEWAY_HOST: 0.0.0.0
       GATEWAY_PORT: "8081"
       GATEWAY_UPSTREAM_BASE: ${GATEWAY_UPSTREAM_BASE:-https://opencode.ai/zen/go/v1}
       GATEWAY_UPSTREAM_KEY: ${OPENCODE_GO_API_KEY:?set OPENCODE_GO_API_KEY}
       GATEWAY_EMBEDDING_MODEL: ${GATEWAY_EMBEDDING_MODEL:-BAAI/bge-small-zh-v1.5}
       GATEWAY_EMBEDDING_DIM: "512"
+      GATEWAY_USAGE_LOG: /models/usage.jsonl
       HF_HOME: /models/hf
     volumes:
       - model_cache:/models
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8081/healthz')\""]
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8081/healthz')\"",
+        ]
       interval: 10s
       timeout: 5s
-      retries: 30
+      retries: 60
     restart: unless-stopped
 
   rag:
@@ -75,7 +86,22 @@ services:
       OPENAI_API_BASE: http://model-gateway:8081/v1
       LITELLM_DROP_PARAMS: "True"
     volumes:
-      - rag_files:/app/files
+      # Template is rendered into the runtime config on startup (v0.1.1 fix:
+      # the previous compose referenced a config file that was never provided).
+      - ../deployment/r2r/meeting_records.toml.template:/app/config-template/meeting_records.toml.template:ro
+      - ../deployment/r2r/render-config.py:/app/render-config.py:ro
+      - ../deployment/r2r/user_tools:/app/user_tools:ro
+    command:
+      [
+        "sh",
+        "-c",
+        "python /app/render-config.py && exec uvicorn core.main.app_entry:app --host 0.0.0.0 --port 7272",
+      ]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:7272/v3/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
     depends_on:
       postgres:
         condition: service_healthy
@@ -93,7 +119,7 @@ services:
       DEFAULT_MODEL: openai-compatible
       COMPATIBLE_BASE_URL: http://model-gateway:8081/v1
       COMPATIBLE_API_KEY: local-gateway
-      COMPATIBLE_MODEL: ${COMPATIBLE_MODEL:-minimax-m3.1-flash-free}
+      COMPATIBLE_MODEL: ${COMPATIBLE_MODEL:-deepseek-v4.1-flash}
       DATABASE_TYPE: postgres
       POSTGRES_USER: agent_app
       POSTGRES_PASSWORD: ${AGENT_DB_PASSWORD:?set AGENT_DB_PASSWORD}
@@ -103,16 +129,26 @@ services:
       R2R_BASE_URL: http://rag:7272
       R2R_SERVICE_EMAIL: ${R2R_ADMIN_EMAIL:-owner@meeting-records.local}
       R2R_SERVICE_PASSWORD: ${R2R_ADMIN_PASSWORD:?set R2R_ADMIN_PASSWORD}
-      MEETING_RERANK_BACKEND: fastembed
+      MEETING_RERANK_BACKEND: ${MEETING_RERANK_BACKEND:-fastembed}
+      MEETING_RERANK_MODEL: ${MEETING_RERANK_MODEL:-BAAI/bge-reranker-base}
       MEETING_RERANK_CACHE_DIR: /models/flashrank
       HF_HOME: /models/hf
     volumes:
       - model_cache:/models
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8080/info')\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 60
     depends_on:
       postgres:
         condition: service_healthy
       rag:
-        condition: service_started
+        condition: service_healthy
       model-gateway:
         condition: service_healthy
     restart: unless-stopped
@@ -126,10 +162,23 @@ services:
       R2R_ADMIN_EMAIL: ${R2R_ADMIN_EMAIL:-owner@meeting-records.local}
       R2R_ADMIN_PASSWORD: ${R2R_ADMIN_PASSWORD:?set R2R_ADMIN_PASSWORD}
       MRA_SESSION_SECRET: ${MRA_SESSION_SECRET:?set MRA_SESSION_SECRET}
+      COPILOTKIT_TELEMETRY_DISABLED: "true"
+      MRA_UPSTREAM_TIMEOUT_MS: ${MRA_UPSTREAM_TIMEOUT_MS:-120000}
+      MRA_AGUI_TIMEOUT_MS: ${MRA_AGUI_TIMEOUT_MS:-900000}
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:3000/auth/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\"",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 30
     depends_on:
-      - agent
-      - rag
+      agent:
+        condition: service_healthy
+      rag:
+        condition: service_healthy
     restart: unless-stopped
-

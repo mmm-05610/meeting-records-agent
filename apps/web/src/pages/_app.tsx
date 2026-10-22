@@ -7,7 +7,6 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { brandingConfig } from '@/config/brandingConfig';
 import { UserProvider, useUserContext } from '@/context/UserContext';
 import '@/styles/globals.css';
-import { initializePostHog } from '@/lib/posthog-client';
 
 function MyAppContent({ Component, pageProps }: AppProps) {
   const { setTheme } = useTheme();
@@ -16,7 +15,8 @@ function MyAppContent({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     setTheme(brandingConfig.theme);
-    initializePostHog();
+    // 上游 R2R 的 PostHog 遥测会把本机使用数据发到 SciPhi 的分析实例，
+    // 属于开发者品牌痕迹；本产品为本机单账号使用，不再初始化该遥测。
   }, []);
 
   const checkAccess = useCallback(async () => {

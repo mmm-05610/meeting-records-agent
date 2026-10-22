@@ -17,6 +17,7 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
+GATEWAY_HOST = os.getenv("GATEWAY_HOST", "127.0.0.1")
 GATEWAY_PORT = int(os.getenv("GATEWAY_PORT", "8081"))
 EMBEDDING_MODEL = os.getenv("GATEWAY_EMBEDDING_MODEL", "BAAI/bge-small-zh-v1.5")
 EMBEDDING_DIM = int(os.getenv("GATEWAY_EMBEDDING_DIM", "512"))
@@ -150,4 +151,4 @@ async def chat_completions(request: Request):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=GATEWAY_PORT, log_level="info")
+    uvicorn.run(app, host=GATEWAY_HOST, port=GATEWAY_PORT, log_level="info")

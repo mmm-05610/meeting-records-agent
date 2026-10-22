@@ -119,13 +119,13 @@ const DocumentsPage: React.FC = () => {
   );
 
   return (
-    <Layout pageTitle="会议" includeFooter={false}>
+    <Layout pageTitle="会议记录" includeFooter={false}>
       <main className="w-full flex flex-col container h-screen-[calc(100%-4rem)] overflow-y-auto">
         <div className="mx-auto w-full max-w-5xl py-6">
-          <header className="mb-6">
+          <header className="mb-5">
             <h1 className="text-xl font-bold text-white">会议记录</h1>
             <p className="mt-1 text-sm text-zinc-400">
-              按项目管理会议记录：导入记录、查看真实处理状态，并在需要时删除记录。
+              导入会议记录、查看真实处理状态，并在需要时删除记录。导入后即可在「问答」中按项目提问。
             </p>
           </header>
 
@@ -142,7 +142,32 @@ const DocumentsPage: React.FC = () => {
             </p>
           )}
 
-          <section className="mt-4 space-y-3">
+          {/* 顶部上传卡片：支持一次选择多个文件 */}
+          <section className="mt-4">
+            <UploadForm
+              projectId={selectedProjectId}
+              projects={projects}
+              onProjectChange={(projectId) => setSelectedProjectId(projectId)}
+              onUploaded={() => {
+                void loadMeetings(selectedProjectId);
+              }}
+              onFinished={({ success, duplicate, failed }) => {
+                if (failed > 0) {
+                  toast({
+                    title: '部分文件导入失败',
+                    description: `成功 ${success} · 重复 ${duplicate} · 失败 ${failed}，请查看文件列表中的错误提示。`,
+                  });
+                } else if (success > 0 || duplicate > 0) {
+                  toast({
+                    title: '导入完成',
+                    description: `成功 ${success} · 重复已存在 ${duplicate}。`,
+                  });
+                }
+              }}
+            />
+          </section>
+
+          <section className="mt-8 space-y-3">
             <ProjectList
               projects={projects}
               loading={projectsLoading}
@@ -167,7 +192,7 @@ const DocumentsPage: React.FC = () => {
             <section className="mt-8 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-zinc-100">
-                  {selectedProject.name} · 会议
+                  {selectedProject.name} · 会议列表
                 </h2>
                 <Link
                   href={`/chat?project=${encodeURIComponent(
@@ -186,18 +211,13 @@ const DocumentsPage: React.FC = () => {
                 error={meetingsError}
                 onRefresh={() => void loadMeetings(selectedProjectId)}
                 onDelete={(meeting) => setDeleteTarget(meeting)}
+                emptyTitle="该项目还没有会议记录"
+                emptyDescription="导入指引：1）在页面上方「导入会议记录」卡片中选择项目；2）选择一个或多个 TXT / Markdown 会议记录文件；3）确认每个文件的会议标题与会议日期，并选择记录类型、填写参与人；4）点击「开始上传」。导入完成后这里会显示标题、日期、类型、参与人与处理状态。"
               />
 
               <p className="text-xs text-zinc-500">
                 只有「已就绪」的会议会进入问答范围；处理中或失败的记录需要重新导入。
               </p>
-
-              <UploadForm
-                projectId={selectedProject.id}
-                onUploaded={() => {
-                  void loadMeetings(selectedProject.id);
-                }}
-              />
             </section>
           )}
         </div>
