@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, HelpCircle, Loader2 } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 import { CitationText } from '@/components/meeting/citation-text';
@@ -24,6 +24,8 @@ export interface AnswerPanelProps {
   /** 本轮状态：只有 completed 才允许展示为已完成答案 */
   status: string;
   draft?: string;
+  /** 服务端要求澄清时，本轮不是最终答案，但不属于失败。 */
+  clarification?: boolean;
   onOpenSource: (entry: SourceEntry) => void;
 }
 
@@ -31,6 +33,7 @@ export function AnswerPanel({
   answerRecord,
   status,
   draft,
+  clarification,
   onOpenSource,
 }: AnswerPanelProps): JSX.Element | null {
   const entries = useMemo(
@@ -42,6 +45,23 @@ export function AnswerPanel({
 
   if (!answerRecord && !draft) {
     return null;
+  }
+
+  if (clarification && !answerRecord) {
+    return (
+      <div className="rounded-md border border-sky-800/60 bg-sky-950/20 p-3">
+        <div className="flex items-center gap-2 text-sm text-sky-200">
+          <HelpCircle className="h-4 w-4" />
+          <span className="font-medium">需要澄清</span>
+          <span className="text-xs text-sky-300/80">
+            回答前需要先确认指代对象，不是最终答案
+          </span>
+        </div>
+        <div className="mt-2 whitespace-pre-wrap break-words text-sm text-zinc-200">
+          {draft}
+        </div>
+      </div>
+    );
   }
 
   if (!completed) {

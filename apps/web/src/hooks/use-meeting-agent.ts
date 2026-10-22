@@ -53,6 +53,19 @@ export interface ChatTurn {
   error: MeetingApiError | null;
   progress: string[];
   createdAt: string;
+  /** True when the assistant asked the user for clarification instead of answering. */
+  clarification?: boolean;
+}
+
+export function looksLikeClarification(text: string): boolean {
+  const value = text.trim();
+  if (!value || value.length > 160) {
+    return false;
+  }
+  if (value.endsWith('？') || value.endsWith('?')) {
+    return true;
+  }
+  return /(你想了解|请确认|请指明|请明确|哪一场|哪个方案|澄清)/.test(value);
 }
 
 export interface MeetingAgentProjection {
@@ -457,6 +470,13 @@ export function useMeetingAgent(
       onRunFinishedEvent: ({ outcome }) => {
         const record = projectionRef.current.answer_record;
         const answerStatus = answerStatusOf(record);
+        const streamingTurn = turnsRef.current.find(
+          (turn) => turn.role === 'assistant' && turn.status === 'streaming'
+        );
+        const isClarification =
+          !record && streamingTurn
+            ? looksLikeClarification(streamingTurn.content)
+            : false;
         const nextStatus: RunStatus =
           outcome === 'interrupt' || outcome === 'cancelled'
             ? 'interrupted'
@@ -464,7 +484,9 @@ export function useMeetingAgent(
               ? 'completed'
               : answerStatus === 'failed'
                 ? 'failed'
-                : 'incomplete';
+                : isClarification
+                  ? 'completed'
+                  : 'incomplete';
         setStatus(nextStatus);
         setTurns((prev) =>
           prev.map((turn) =>
@@ -478,6 +500,7 @@ export function useMeetingAgent(
                       ? record.text
                       : turn.content,
                   progress: projectionRef.current.progress,
+                  clarification: isClarification || turn.clarification,
                 }
               : turn
           )
@@ -685,15 +708,17 @@ export function useMeetingAgent(
         }
         const answerStatus = answerStatusOf(record);
         const content = record?.text ?? message.content;
+        const clarification = !record && looksLikeClarification(content);
         return {
           id: message.id || randomId(),
           role: 'assistant',
           content,
           answerRecord: record,
-          status: answerStatus ?? 'incomplete',
+          status: answerStatus ?? (clarification ? 'completed' : 'incomplete'),
           error: null,
           progress: [],
           createdAt: new Date().toISOString(),
+          clarification,
         };
       });
 

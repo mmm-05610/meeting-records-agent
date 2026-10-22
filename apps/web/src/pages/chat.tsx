@@ -506,6 +506,7 @@ const ChatPage: React.FC = () => {
                           answerRecord={turn.answerRecord}
                           status={turn.status}
                           draft={turn.content}
+                          clarification={turn.clarification}
                           onOpenSource={handleOpenSource}
                         />
                       )}

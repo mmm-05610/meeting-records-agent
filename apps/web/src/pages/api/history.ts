@@ -24,7 +24,13 @@ import { readJsonBody } from '@/server/multipart';
 interface AgentMessage {
   id?: string;
   role?: string;
+  type?: string;
   content?: unknown;
+}
+
+function roleOf(message: AgentMessage): 'user' | 'assistant' {
+  const value = message.role ?? message.type ?? '';
+  return value === 'human' || value === 'user' ? 'user' : 'assistant';
 }
 
 export const config = {
@@ -70,7 +76,7 @@ export default withApiErrors(
     return res.status(200).json({
       messages: messages.map((message) => ({
         id: message.id ?? '',
-        role: message.role ?? 'assistant',
+        role: roleOf(message),
         content: message.content ?? '',
       })),
       answer_records: answerRecords,
