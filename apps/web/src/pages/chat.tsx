@@ -225,15 +225,42 @@ const ChatPage: React.FC = () => {
         if (cancelled) {
           return;
         }
-        setHistoryError(
+        const apiError =
           error instanceof MeetingApiError
             ? error
             : new MeetingApiError({
                 category: 'service_failure',
                 message: '恢复历史线程失败，请稍后重试。',
                 retryable: true,
-              })
-        );
+              });
+        if (apiError.category === 'scope_forbidden') {
+          // Legacy threads (created before account binding) cannot be restored.
+          // Start a clean thread instead of leaving the user on a broken session.
+          const fresh = createThreadId();
+          setThreadId(fresh);
+          agent.reset();
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(THREAD_STORAGE_KEY, fresh);
+          }
+          void router.replace(
+            {
+              pathname: '/chat',
+              query: { ...router.query, thread: fresh },
+            },
+            undefined,
+            { shallow: true }
+          );
+          setHistoryError(
+            new MeetingApiError({
+              category: 'scope_forbidden',
+              message:
+                '该历史会话来自旧版本或不属于当前账号，已为你新建会话；请重新提问。',
+              retryable: false,
+            })
+          );
+        } else {
+          setHistoryError(apiError);
+        }
       } finally {
         if (!cancelled) {
           setHistoryLoading(false);

@@ -44,12 +44,14 @@ def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
     match message:
         case HumanMessage():
             human_message = ChatMessage(
+                id=message.id,
                 type="human",
                 content=convert_message_content_to_string(message.content),
             )
             return human_message
         case AIMessage():
             ai_message = ChatMessage(
+                id=message.id,
                 type="ai",
                 content=convert_message_content_to_string(message.content),
             )

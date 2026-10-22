@@ -92,6 +92,10 @@ class ToolCall(TypedDict):
 class ChatMessage(BaseModel):
     """Message in a chat."""
 
+    id: str | None = Field(
+        description="Stable message id; AI messages use the AnswerRecord message_id.",
+        default=None,
+    )
     type: Literal["human", "ai", "tool", "custom"] = Field(
         description="Role of the message.",
         examples=["human", "ai", "tool", "custom"],

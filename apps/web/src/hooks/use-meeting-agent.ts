@@ -636,13 +636,41 @@ export function useMeetingAgent(
   const restore = useCallback(
     (history: HistoryResult) => {
       const recordsByMessage = new Map<string, AnswerRecord>();
+      const pendingRecords: AnswerRecord[] = [];
       for (const record of history.answer_records ?? []) {
         if (record?.message_id) {
           recordsByMessage.set(record.message_id, record);
         }
+        pendingRecords.push(record);
       }
+      const takeRecord = (message: {
+        id: string;
+        content: string;
+      }): AnswerRecord | null => {
+        const byId = message.id ? recordsByMessage.get(message.id) : undefined;
+        if (byId) {
+          const index = pendingRecords.indexOf(byId);
+          if (index >= 0) pendingRecords.splice(index, 1);
+          return byId;
+        }
+        // Older checkpoints predate the message-id link: pair by exact text first,
+        // then fall back to the next unconsumed completed record in order.
+        const byText = pendingRecords.find(
+          (record) =>
+            record.text && record.text.trim() === message.content.trim()
+        );
+        const byOrder =
+          byText ??
+          pendingRecords.find((record) => record.status === 'completed') ??
+          pendingRecords[0];
+        if (byOrder) {
+          const index = pendingRecords.indexOf(byOrder);
+          if (index >= 0) pendingRecords.splice(index, 1);
+        }
+        return byOrder ?? null;
+      };
       const restored: ChatTurn[] = history.messages.map((message) => {
-        const record = recordsByMessage.get(message.id) ?? null;
+        const record = message.role === 'user' ? null : takeRecord(message);
         if (message.role === 'user') {
           return {
             id: message.id || randomId(),

@@ -529,7 +529,7 @@ async def finalize_answer(state: MeetingState, config: RunnableConfig) -> Meetin
     return {
         "answer_record": json.loads(record.model_dump_json()),
         "answer_records": [*state.get("answer_records", []), json.loads(record.model_dump_json())],
-        "messages": [AIMessage(content=text)],
+        "messages": [AIMessage(id=record.message_id, content=text)],
         "progress": [*state.get("progress", []), "引用与范围校验通过，回答已完成并保存"],
     }
 

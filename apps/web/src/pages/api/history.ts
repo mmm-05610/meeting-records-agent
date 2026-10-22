@@ -45,8 +45,6 @@ export default withApiErrors(
       throw inputError('缺少 thread_id。', ['thread_id']);
     }
 
-    await assertThreadOwnership(session.uid, threadId);
-
     const payload = await agentFetchJson(agentHistoryUrl(), {
       method: 'POST',
       body: JSON.stringify({ thread_id: threadId }),
@@ -59,6 +57,15 @@ export default withApiErrors(
       run_status?: string;
     };
     const messages = Array.isArray(result.messages) ? result.messages : [];
+    const answerRecords = Array.isArray(result.answer_records)
+      ? result.answer_records
+      : [];
+
+    // A brand-new thread has no persisted messages and needs no ownership check.
+    // Existing threads are only readable by the account that owns them.
+    if (messages.length > 0 || answerRecords.length > 0) {
+      await assertThreadOwnership(session.uid, threadId);
+    }
 
     return res.status(200).json({
       messages: messages.map((message) => ({
@@ -66,9 +73,7 @@ export default withApiErrors(
         role: message.role ?? 'assistant',
         content: message.content ?? '',
       })),
-      answer_records: Array.isArray(result.answer_records)
-        ? result.answer_records
-        : [],
+      answer_records: answerRecords,
       scope: result.scope ?? null,
       run_status:
         typeof result.run_status === 'string'
