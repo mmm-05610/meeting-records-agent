@@ -1,0 +1,46 @@
+{
+  "passed": 8,
+  "failed": 0,
+  "results": [
+    {
+      "name": "重启前完成一轮带引用问答",
+      "ok": true,
+      "detail": "http=200"
+    },
+    {
+      "name": "历史返回 AnswerRecord 与范围",
+      "ok": true,
+      "detail": "records=1 status=completed"
+    },
+    {
+      "name": "失败轮次不显示为已完成",
+      "ok": true,
+      "detail": "没有历史记录（不属于已完成会话）"
+    },
+    {
+      "name": "重启后历史仍可读",
+      "ok": true,
+      "detail": "records=1"
+    },
+    {
+      "name": "重启后答案文本一致",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "重启后范围快照一致",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "重启后引用映射保留",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "重启后 R2R 数据仍在",
+      "ok": true,
+      "detail": "http=200"
+    }
+  ]
+}

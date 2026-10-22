@@ -1,0 +1,11 @@
+{
+  "passed": 1,
+  "failed": 0,
+  "results": [
+    {
+      "name": "超出阅读预算时明确中止，不输出最终决定",
+      "ok": true,
+      "detail": "error={'category': 'budget_exceeded', 'message': '选中会议数 6 超过核对上限 2，请缩小范围。'} answered=False"
+    }
+  ]
+}

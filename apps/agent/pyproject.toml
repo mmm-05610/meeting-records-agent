@@ -27,7 +27,6 @@ dependencies = [
     "langchain-community ~=0.4.2",
     "langchain-anthropic ~=1.4.8",
     "langchain-aws ~=1.6.1",
-    "langchain-chroma ~=1.1.0",
     "langchain-google-genai ~=4.2.6",
     "langchain-google-vertexai>=3.2.4",
     "langchain-groq ~=1.1.3",
@@ -38,6 +37,9 @@ dependencies = [
     "langgraph-checkpoint-mongodb ~=0.4.0",
     "langgraph-checkpoint-postgres~=3.1.1",
     "langgraph-checkpoint-sqlite ~=3.1.0",
+    # Meeting records retrieval: local cross-encoder rerankers (no external service).
+    "fastembed ~=0.5.1",
+    "flashrank ~=0.2.10",
     "langgraph-supervisor ~=0.0.31",
     "langsmith ~=0.11.0",
     "numexpr ~=2.14.1",

@@ -62,11 +62,6 @@ const NavItems: React.FC<NavItemsProps> = ({
       label: 'Chat',
       show: brandingConfig.navbar.menuItems.chat,
     },
-    {
-      path: '/search',
-      label: 'Search',
-      show: brandingConfig.navbar.menuItems.search,
-    },
   ];
 
   const adminItems = [

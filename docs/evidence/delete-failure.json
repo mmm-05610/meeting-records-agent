@@ -1,0 +1,41 @@
+{
+  "passed": 7,
+  "failed": 0,
+  "results": [
+    {
+      "name": "准备删除用的会议已入库",
+      "ok": true,
+      "detail": "http=201"
+    },
+    {
+      "name": "拿到文档 ID",
+      "ok": true,
+      "detail": "0a432900-5076-5453-932e-0d228bfd410c"
+    },
+    {
+      "name": "部分失败返回失败而不是成功",
+      "ok": true,
+      "detail": "http=500 {\"error\":{\"category\":\"service_failure\",\"message\":\"会议记录未完全清理，请稍后重试。\",\"fields\":[],\"retryable\":true},\"deleted\":false,\"docum"
+    },
+    {
+      "name": "部分失败后文档记录保留以便重试",
+      "ok": true,
+      "detail": "documents=1"
+    },
+    {
+      "name": "恢复后重试删除成功",
+      "ok": true,
+      "detail": "http=200 {\"deleted\":true,\"document_id\":\"0a432900-5076-5453-932e-0d228bfd410c\",\"file_deleted\":true,\"chunks_deleted\":true}"
+    },
+    {
+      "name": "删除后分块/原件/文档全部清零",
+      "ok": true,
+      "detail": "chunks=0 files=0 docs=0"
+    },
+    {
+      "name": "其他会议不受影响",
+      "ok": true,
+      "detail": "others=18"
+    }
+  ]
+}

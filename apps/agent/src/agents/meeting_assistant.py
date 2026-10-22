@@ -153,6 +153,14 @@ async def prepare_scope(state: MeetingState, config: RunnableConfig) -> MeetingS
     except Exception as exc:  # noqa: BLE001
         return _fail(state, ErrorCategory.INPUT_ERROR, f"查询范围无效：{exc}")
     question = _text_of(state["messages"][-1]) if state.get("messages") else ""
+    # Deterministic pronoun binding (A11): if the user refers back ("那次会议"/"那个方案")
+    # and a previous assistant message named a meeting in scope, bind that meeting.
+    if re.search(r"那次|那个|该会议|上述|这个会|它", question) and len(state.get("messages", [])) >= 2:
+        prior = " ".join(_text_of(message) for message in state["messages"][-4:])
+        titles = [doc.title for doc in snapshot.documents if doc.title]
+        hits = [title for title in titles if title and title in prior]
+        if hits:
+            question = f"{question}\n（上文所指的会议：{hits[0]}）"
     return {
         "scope_request": scope_request.model_dump(mode="json"),
         "scope_snapshot": json.loads(snapshot.model_dump_json()),
@@ -170,7 +178,10 @@ async def classify_intent(state: MeetingState, config: RunnableConfig) -> Meetin
         '- "decision"：当前最终决定、是否改了、为什么改、谁定的、变化过程、冲突。\n'
         "若问题缺少必要指代（例如只说“那件事”“这个方案”且历史中无法确定），"
         '返回 {"intent":"fact","needs_clarification":true,"clarification":"要向用户提出的一个具体澄清问题"}。\n'
-        '否则返回 {"intent":"fact|decision","needs_clarification":false,"clarification":null,"issue":"一句话概括要核对的议题"}。\n'
+        '否则返回 {"intent":"fact|decision","needs_clarification":false,"clarification":null,'
+        '"resolved_question":"用最近对话补全指代后的完整问题","issue":"一句话概括要核对的议题"}。\n'
+        "resolved_question 必须自包含：把“那次会议”“那个方案”等指代替换成对话中明确的对象；"
+        "如果无法从对话确定指代，则把 needs_clarification 置为 true。\n"
         "只输出 JSON。"
     )
     history = "\n".join(
@@ -182,6 +193,20 @@ async def classify_intent(state: MeetingState, config: RunnableConfig) -> Meetin
         result = await _json_call(_model(config), system, user)
     except MeetingAgentError as exc:
         return _fail(state, exc.category, exc.message)
+    if result.get("needs_clarification") and state.get("messages") and len(state["messages"]) >= 2:
+        # A pronoun that the assistant itself just resolved should bind to that object,
+        # not trigger a clarification round (A11).
+        retry_system = (
+            system
+            + "\n注意：最近对话中助手已经提到具体会议/方案；用户使用“那次会议/那个方案”时，"
+            "必须绑定最近对话中的对象并给出 resolved_question，禁止反问是哪一场。"
+        )
+        try:
+            retried = await _json_call(_model(config), retry_system, user)
+        except MeetingAgentError:
+            retried = {}
+        if retried.get("resolved_question") and not retried.get("needs_clarification"):
+            result = retried
     if result.get("needs_clarification"):
         question = result.get("clarification") or "你指的是哪一场会议或哪一个方案？"
         return {
@@ -189,6 +214,10 @@ async def classify_intent(state: MeetingState, config: RunnableConfig) -> Meetin
             "messages": [AIMessage(content=question)],
             "progress": [*state.get("progress", []), "需要澄清后才能继续"],
         }
+    resolved = result.get("resolved_question")
+    updates: dict[str, Any] = {}
+    if isinstance(resolved, str) and resolved.strip() and resolved.strip() != state.get("question"):
+        updates["question"] = resolved.strip()
     intent = result.get("intent")
     if intent not in {"fact", "decision"}:
         intent = "fact"
@@ -196,6 +225,7 @@ async def classify_intent(state: MeetingState, config: RunnableConfig) -> Meetin
     if config.get("configurable", {}).get("strategy") in {"B0", "B1"}:
         intent = "fact"
     return {
+        **updates,
         "intent": intent,
         "progress": [*state.get("progress", []), f"问题类型：{'决定/变更核对' if intent == 'decision' else '事实问答'}"],
     }
@@ -504,6 +534,10 @@ async def finalize_answer(state: MeetingState, config: RunnableConfig) -> Meetin
     }
 
 
+def _route_after_node(state: MeetingState, next_node: str) -> str:
+    return "end" if state.get("error") else next_node
+
+
 def _route_after_scope(state: MeetingState) -> str:
     if state.get("error"):
         return "end"
@@ -534,11 +568,22 @@ def build_meeting_graph():
         _route_after_classify,
         {"fact": "search_evidence", "decision": "gather_meetings", "end": END},
     )
-    graph.add_edge("search_evidence", "answer_fact")
-    graph.add_edge("answer_fact", "finalize")
-    graph.add_edge("gather_meetings", "extract_per_meeting")
-    graph.add_edge("extract_per_meeting", "merge_decisions")
-    graph.add_edge("merge_decisions", "finalize")
+    def after(node: str):
+        return lambda state: _route_after_node(state, node)
+
+    graph.add_conditional_edges(
+        "search_evidence", after("answer_fact"), {"answer_fact": "answer_fact", "end": END}
+    )
+    graph.add_conditional_edges("answer_fact", after("finalize"), {"finalize": "finalize", "end": END})
+    graph.add_conditional_edges(
+        "gather_meetings", after("extract_per_meeting"), {"extract_per_meeting": "extract_per_meeting", "end": END}
+    )
+    graph.add_conditional_edges(
+        "extract_per_meeting", after("merge_decisions"), {"merge_decisions": "merge_decisions", "end": END}
+    )
+    graph.add_conditional_edges(
+        "merge_decisions", after("finalize"), {"finalize": "finalize", "end": END}
+    )
     graph.add_edge("finalize", END)
     return graph.compile()
 

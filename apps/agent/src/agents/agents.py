@@ -13,7 +13,6 @@ from agents.langgraph_supervisor_agent import langgraph_supervisor_agent
 from agents.langgraph_supervisor_hierarchy_agent import langgraph_supervisor_hierarchy_agent
 from agents.lazy_agent import LazyLoadingAgent
 from agents.meeting_assistant import meeting_assistant
-from agents.rag_assistant import rag_assistant
 from agents.research_assistant import research_assistant
 from schema import AgentInfo
 
@@ -37,10 +36,6 @@ agents: dict[str, Agent] = {
     "research-assistant": Agent(
         description="A research assistant with web search and calculator.",
         graph_like=research_assistant,
-    ),
-    "rag-assistant": Agent(
-        description="A RAG assistant with access to information in a database.",
-        graph_like=rag_assistant,
     ),
     "meeting-assistant": Agent(
         description="会议记录问答助手：跨会议事实、分工、决定与变更核对，逐项引用原文。",

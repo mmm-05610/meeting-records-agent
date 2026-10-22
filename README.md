@@ -51,6 +51,8 @@ bash scripts/native/init-db.sh
 
 - 安装/配置/启动/停止/备份恢复：[docs/usage/install.md](docs/usage/install.md)、[docs/usage/operations.md](docs/usage/operations.md)
 - 三份演示记录与体验步骤：[docs/usage/demo.md](docs/usage/demo.md)
+- 验收结果 A01–A24：[docs/evidence/v0.1-acceptance.md](docs/evidence/v0.1-acceptance.md)
+- 真实评测报告：[docs/evidence/evaluation-summary.md](docs/evidence/evaluation-summary.md)
 - 交付形态的 Compose（本机无 Docker 守护进程，未实跑）：[deployment/docker-compose.yaml](deployment/docker-compose.yaml)
 
 本机实际验证的是 native 模式（PostgreSQL 18 + pgvector、模型网关、R2R、Agent、Web 五个进程）；

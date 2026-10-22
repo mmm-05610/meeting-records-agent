@@ -85,6 +85,7 @@ PORT=8090
 LOG_LEVEL=INFO
 ENV
 mkdir -p "$TARGET/.run/r2r" "$TARGET/data" "$TARGET/logs"
+set -a; source .env; set +a
 echo "admin: owner@meeting-records.local (password stored in $TARGET/.env)"
 
 echo "== 3. install PostgreSQL 18 + pgvector (no root) =="
@@ -118,6 +119,7 @@ bash scripts/native/service.sh start web bash scripts/native/start-web.sh
 sleep 8
 
 echo "== 7. import demo meetings =="
+set -a; source .env; set +a
 apps/agent/.venv/bin/python scripts/demo/import_dataset.py \
   --dir evals/datasets/sim-project-a --collection-name "模拟项目A：星河笔记" \
   --output data/imports/sim-project-a.json

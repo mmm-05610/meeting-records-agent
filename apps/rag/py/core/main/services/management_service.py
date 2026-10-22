@@ -209,24 +209,10 @@ class ManagementService(Service):
         file_cleanup_ok = 0
         file_cleanup_failures: list[str] = []
         for doc_id in docs_to_delete:
-            # Delete related entities & relationships if needed:
-            await self.providers.database.graphs_handler.entities.delete(
-                parent_id=doc_id,
-                store_type=StoreType.DOCUMENTS,
-            )
-            await self.providers.database.graphs_handler.relationships.delete(
-                parent_id=doc_id,
-                store_type=StoreType.DOCUMENTS,
-            )
-
-            # Finally, delete the document from documents_overview:
-            await self.providers.database.documents_handler.delete(
-                document_id=doc_id
-            )
-
             # PATCH(meeting-records-agent): the upstream delete path never cleaned
             # the file provider, so the original bytes stayed queryable/downloadable
-            # after "delete". Hook the existing provider cleanup into the same chain.
+            # after "delete". Clean the file FIRST so a failure leaves the document
+            # row in place and a retry can finish the cleanup (C07).
             try:
                 await self.providers.file.delete_file(doc_id)
                 file_cleanup_ok += 1
@@ -243,6 +229,7 @@ class ManagementService(Service):
                         doc_id,
                         exc.message,
                     )
+                    continue
             except Exception as exc:  # noqa: BLE001 - report, never fake success
                 file_cleanup_failures.append(str(doc_id))
                 logger.error(
@@ -250,6 +237,22 @@ class ManagementService(Service):
                     doc_id,
                     exc,
                 )
+                continue
+
+            # Delete related entities & relationships if needed:
+            await self.providers.database.graphs_handler.entities.delete(
+                parent_id=doc_id,
+                store_type=StoreType.DOCUMENTS,
+            )
+            await self.providers.database.graphs_handler.relationships.delete(
+                parent_id=doc_id,
+                store_type=StoreType.DOCUMENTS,
+            )
+
+            # Finally, delete the document from documents_overview:
+            await self.providers.database.documents_handler.delete(
+                document_id=doc_id
+            )
 
         return {
             "success": not file_cleanup_failures,

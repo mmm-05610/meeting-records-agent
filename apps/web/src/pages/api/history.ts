@@ -52,7 +52,12 @@ export default withApiErrors(
       body: JSON.stringify({ thread_id: threadId }),
     });
 
-    const result = (payload ?? {}) as { messages?: AgentMessage[] };
+    const result = (payload ?? {}) as {
+      messages?: AgentMessage[];
+      answer_records?: unknown[];
+      scope?: unknown;
+      run_status?: string;
+    };
     const messages = Array.isArray(result.messages) ? result.messages : [];
 
     return res.status(200).json({
@@ -61,9 +66,16 @@ export default withApiErrors(
         role: message.role ?? 'assistant',
         content: message.content ?? '',
       })),
-      answer_records: [],
-      scope: null,
-      run_status: messages.length > 0 ? 'completed' : 'empty',
+      answer_records: Array.isArray(result.answer_records)
+        ? result.answer_records
+        : [],
+      scope: result.scope ?? null,
+      run_status:
+        typeof result.run_status === 'string'
+          ? result.run_status
+          : messages.length > 0
+            ? 'completed'
+            : 'empty',
     });
   }
 );

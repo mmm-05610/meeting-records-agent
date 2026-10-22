@@ -234,3 +234,39 @@
 （`apps/agent/src/schema/meeting.py`、`apps/web/src/types/meeting-contracts.ts`、
 `apps/web/src/server/meeting-identity.ts`、`deployment/r2r/meeting_records.toml.template`、
 `services/model-gateway/`），没有回写进上游模块。
+
+## P9 删除主链补齐 file provider 清理（T006 / A13）
+
+- 问题：上游 `delete_documents_and_chunks_by_filter` 只删分块与文档行，`files` 表与 large object 残留，
+  删除后原件仍可下载/查询，违反 C07。
+- 改动：在 `apps/rag/py/core/main/services/management_service.py` 的删除主链中先调用
+  `providers.file.delete_file(doc_id)`，成功后才删除文档行；失败则保留文档行、返回 `success=false`
+  与 `file_cleanup_failures`，router 映射为 500，重试可完成清理。
+- 依据：实测“删除后 files=1、chunks=0、docs=0”；修复后实测三处全 0；注入 `REVOKE DELETE` 时
+  返回 500 且文档保留，恢复权限后重试成功（`docs/evidence/delete-failure.json`）。
+
+## P10 重排后端：FlashRank → FastEmbed bge-reranker-base（T008 / A23）
+
+- 问题：FlashRank `ms-marco-MultiBERT-L-12` 在真实中文会议片段上排序不可靠（含答案片段 0.0075 vs
+  会议头部 0.1479）。上游要求的“LangChain FlashrankRerank/FlashRank”仍保留为可切换后端。
+- 改动：`apps/agent/src/agents/meeting_tools.py` 增加 `MEETING_RERANK_BACKEND`（`fastembed` 默认 /
+  `flashrank`），默认模型 `BAAI/bge-reranker-base`；两者都在进程内本地运行，无外部服务。
+- 依据：`docs/evidence/evaluation-summary.md` 的“重排模型选择依据”。
+
+## P11 图错误传播与指代绑定（T010/T011 / A11/A15）
+
+- 问题：节点返回错误后仍沿固定边继续执行，最终错误被后续节点的错误覆盖（预算超限被报成 `invalid_citation`）。
+- 改动：`apps/agent/src/agents/meeting_assistant.py` 在 `search_evidence/answer_fact/gather_meetings/
+  extract_per_meeting/merge_decisions` 后增加 `state.error → END` 的条件路由；`prepare_scope` 增加
+  确定性指代绑定（把“那次会议”绑定到上一轮助手提到的、当前范围内的会议标题）。
+- 依据：`docs/evidence/budget.json`（`budget_exceeded`）、`docs/evidence/behavior-focus.json`
+  （追问解析、澄清）。
+
+## P12 R2R 上传/元数据适配（T005 / A01）
+
+- 问题：`POST /v3/documents` 在 `metadata.title` 存在时把 title 当文件名（扩展名丢失→415）；
+  `PATCH /documents/{id}/metadata` 实际把请求体数组中的字典合并进 metadata，而非 OpenAPI 示例的
+  `[{key,value}]` 形式。
+- 改动：上传显式传确定性 UUID `id`、metadata 不含 title，成功后用 `[{"title": ...}]` 追加展示标题；
+  `apps/web/src/server/ingest.ts` 与 `scripts/demo/import_dataset.py` 一致实现。
+- 依据：`tests/smoke/real_ingest_smoke.py`、`docs/contracts-v0.1.md` 第 2 条。

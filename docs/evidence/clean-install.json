@@ -1,0 +1,36 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "results": [
+    {
+      "name": "新装环境登录成功",
+      "ok": true,
+      "detail": "http=200"
+    },
+    {
+      "name": "新装环境读到导入的项目",
+      "ok": true,
+      "detail": "projects=2"
+    },
+    {
+      "name": "新装环境会议列表完整",
+      "ok": true,
+      "detail": "meetings=6"
+    },
+    {
+      "name": "新装环境真实问答返回完成答案",
+      "ok": true,
+      "detail": "http=200"
+    },
+    {
+      "name": "答案带稳定引用",
+      "ok": true,
+      "detail": "citations=8"
+    },
+    {
+      "name": "答案内容正确（混合检索）",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

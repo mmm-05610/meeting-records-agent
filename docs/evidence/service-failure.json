@@ -1,0 +1,26 @@
+{
+  "passed": 4,
+  "failed": 0,
+  "results": [
+    {
+      "name": "R2R 正常时可以得到答案",
+      "ok": true,
+      "detail": "status=completed"
+    },
+    {
+      "name": "R2R 不可用返回真实服务故障",
+      "ok": true,
+      "detail": "error={'category': 'service_failure', 'message': 'R2R request failed: All connection attempts failed'}"
+    },
+    {
+      "name": "故障未被伪装成无证据",
+      "ok": true,
+      "detail": "no completed AnswerRecord"
+    },
+    {
+      "name": "R2R 恢复后重新可用",
+      "ok": true,
+      "detail": "status=completed"
+    }
+  ]
+}

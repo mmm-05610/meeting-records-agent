@@ -44,7 +44,7 @@ bash scripts/native/install-postgres.sh
 bash scripts/native/init-db.sh
 
 # 2.3 Python/Node 依赖（每个应用独立环境）
-source .run/scripts/env.sh
+source scripts/native/uv-env.sh
 (cd apps/rag/py && uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -e ".[core]")
 (cd apps/agent && uv sync --frozen --python 3.12)
 (cd apps/web && pnpm install --no-frozen-lockfile)

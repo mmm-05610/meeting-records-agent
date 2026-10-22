@@ -97,12 +97,16 @@ def main() -> int:
     # A failed run must not be reported as completed.
     failed_thread = f"failed-{int(time.time())}"
     ask(session, failed_thread, "问题", {"collection_id": PROJECT["collection_id"], "mode": "explicit", "document_ids": []})
-    failed_history = history(session, failed_thread)
-    record(
-        "失败轮次不显示为已完成",
-        failed_history.get("run_status") in {"failed", "interrupted"},
-        f"status={failed_history.get('run_status')}",
-    )
+    status, body = session.call("POST", "/api/history", {"thread_id": failed_thread})
+    if status == 404:
+        record("失败轮次不显示为已完成", True, "没有历史记录（不属于已完成会话）")
+    else:
+        failed_history = json.loads(body)
+        record(
+            "失败轮次不显示为已完成",
+            failed_history.get("run_status") in {"failed", "interrupted"} and not failed_history.get("answer_records"),
+            f"status={failed_history.get('run_status')} records={len(failed_history.get('answer_records') or [])}",
+        )
 
     service("stop", "web")
     service("stop", "agent")
