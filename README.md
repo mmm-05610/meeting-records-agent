@@ -1,86 +1,90 @@
-# meeting-records-agent
+# meeting-records-agent · 会议记录助手
 
-会议记录问答助手：导入一个项目的多次会议记录，查清“最后怎么定的、谁负责、为什么改了”，并通过引用核对原文。
+导入一个项目的多次会议记录，查清**最后怎么定、谁负责、为什么改**，并点开引用核对原文。
 
-**当前状态：v0.1.1 已实现并在本机真实链路验证。** 三个应用基于固定上游二次开发，可在本机安装、导入中文会议记录、跨会议问答并逐项核对引用；评测、验收证据与已知限制见
-[docs/evidence/v0.1.1-acceptance.md](docs/evidence/v0.1.1-acceptance.md)、
-[docs/evidence/evaluation-summary-v0.1.1.md](docs/evidence/evaluation-summary-v0.1.1.md) 与
-[交付说明](docs/delivery-v0.1.1.md)。
+[安装运行](docs/usage/install.md) · [演示步骤](docs/usage/demo.md) · [版本状态](docs/releases/v0.1.1-preview.md) · [详细设计](docs/design-v0.1.md)
 
-## v0.1 要做什么
+![实际问答界面：项目范围、带引用的回答与逐项核对详情](docs/evidence/screenshots/v011-answer-details.png)
 
-- 导入 UTF-8 TXT、Markdown，填写会议名称、日期和记录类型。
-- 按项目或指定会议提问，查询事实、分工、决定及变更原因。
-- 区分提议、明确确认、后续变更和记录冲突；缺少依据时说明未知。
-- 从回答逐项打开引用，查看对应会议原文。
-- 保存会话、查询范围与来源；移除记录后，新回答不再使用它。
+*本地运行截图，内容来自仓库内的模拟会议数据。当前为 v0.1.1 预览版，面向个人本地使用。*
 
-首版面向个人本地使用，处理已有文字记录。语音转写、自动入会、会议平台同步、团队共享和任务派发不在 v0.1 范围内。
+## 可以问什么
 
-## 技术架构与二次开发来源
+| 问题 | 处理方式 |
+|---|---|
+| 检索方案最后采用了哪个？ | 按会议日期核对提议、确认和后续变更，列出依据 |
+| 最新会议又建议换方案，是已经改了吗？ | 区分重新提议与明确决议，说明是否存在覆盖此前决定的证据 |
+| 谁负责技术验证，记录里说完成了吗？ | 查询分工与进度；没有记载时说明未知 |
+| 为什么从方案 A 改成 B？ | 对照变更前后的记录，引用讨论理由与确认内容 |
 
-![目标架构：三个应用服务与一个 PostgreSQL 实例](docs/assets/architecture.svg)
+支持批量导入 UTF-8 TXT / Markdown、按项目或指定会议提问、查看原文来源、恢复历史会话。删除记录后，新回答不再检索它，旧引用标记失效。
 
-| 部分 | 基于什么改造 | 主要改动 |
-|---|---|---|
-| Agent 服务 | [agent-service-toolkit](https://github.com/JoshuaC215/agent-service-toolkit) · Python、FastAPI、LangChain、LangGraph | 会议范围、事实检索与决定核对两条路径、引用和历史响应 |
-| 文档与检索 | [R2R](https://github.com/SciPhi-AI/R2R) · PostgreSQL、pgvector | 会议元数据、配置裁剪、导入与删除流程适配 |
-| Web | [R2R-Application](https://github.com/SciPhi-AI/R2R-Application) · TypeScript、Next.js、React | 会议列表、范围选择、上传和来源展示 |
-| 聊天交互 | [CopilotKit 官方 LangGraph FastAPI 示例](https://github.com/CopilotKit/CopilotKit/tree/abc6807f35865e043c498398e3080f137ddbdad9/examples/integrations/langgraph-fastapi) · AG-UI | 接入现有 Web，传递查询范围、回答与引用 |
-| 重排 | LangChain FlashrankRerank、FlashRank | 配置模型和预算，保留文档、分块标识 |
-| 离线评测 | [Ragas 官方示例](https://github.com/vibrantlabsai/ragas/tree/298b68274234c060deacab3cf5fb52aa3a20e885/examples) | 模拟会议、标准答案、引用与决定判断用例 |
-| 可选追踪 | LangSmith SDK | 默认关闭，按需配置 trace |
+<details>
+<summary>查看会议记录管理界面</summary>
 
-功能模块以现有项目二次开发和组件集成为基础。接口适配、提示词、配置及既有流程修改仍需实现；不会另建会议管理后端、工作流引擎或聊天框架。LangGraph 负责唯一的 Agent 编排，Agent 和 R2R 使用独立 Python 环境并通过 HTTP 通信。
+![会议记录管理：批量上传、项目选择与处理状态](docs/evidence/screenshots/v011-documents.png)
 
-## 文档
+</details>
 
-- [v0.1 详细设计](docs/design-v0.1.md)：功能、流程、数据、接口、部署目标、目录、评测与验收。
-- [上游来源与采用方式](docs/upstream.md)：采用边界、固定版本及待验证事项。
-- [上游版本记录](upstream-lock.yaml)：选型基线，尚不是已安装依赖的锁文件。
-- 图示：[页面布局](docs/assets/workspace.svg)、[Agent 流程](docs/assets/agent.svg)、[导入流程](docs/assets/ingestion.svg)。
+## 本地运行
 
-## 当前怎么使用
+当前验证路径是 **Linux 本机进程部署**。需要 Python 3.12、uv、Node.js 22、pnpm 和生成模型 API；PostgreSQL 安装脚本依赖 Debian / Ubuntu 软件包工具与 PostgreSQL 18 软件源。完整前提和命令见[安装文档](docs/usage/install.md)。
 
 ```bash
 git clone https://github.com/mmm-05610/meeting-records-agent.git
 cd meeting-records-agent
-cp .env.example .env         # 填入 OPENCODE_GO_API_KEY 等
-bash scripts/native/install-postgres.sh
-bash scripts/native/init-db.sh
-# 依赖安装与启动见 docs/usage/install.md
+cp .env.example .env
+cp apps/web/.env.local.example apps/web/.env.local
 ```
 
-- 安装/配置/启动/停止/备份恢复：[docs/usage/install.md](docs/usage/install.md)、[docs/usage/operations.md](docs/usage/operations.md)
-- 三份演示记录与体验步骤：[docs/usage/demo.md](docs/usage/demo.md)
-- 验收结果 A01–A24：[docs/evidence/v0.1-acceptance.md](docs/evidence/v0.1-acceptance.md)
-- 真实评测报告：[docs/evidence/evaluation-summary.md](docs/evidence/evaluation-summary.md)
-- 交付形态的 Compose（本机无 Docker 守护进程，未实跑）：[deployment/docker-compose.yaml](deployment/docker-compose.yaml)
+1. 按安装文档配置密钥与本地账号，保持两份环境文件中的账号配置一致。
+2. 安装依赖，启动数据库、模型网关、R2R、Agent 和 Web。
+3. 打开 <http://127.0.0.1:3000>，登录后导入自己的会议记录，或使用[内置演示数据](docs/usage/demo.md)。
 
-本机实际验证的是 native 模式（PostgreSQL 18 + pgvector、模型网关、R2R、Agent、Web 五个进程）；
-Web 仅监听 `127.0.0.1:3000`，登录使用本地单账号。
+**建议先试这个问题：**“星河笔记 v1.0 的检索方案最后怎么定的？最新会议重新建议改回标签过滤方案，会影响当前决定吗？”
 
-## 实施顺序
+演示记录中，3 月确认了混合检索，5 月只是重新提出替代建议。可以据此检查回答是否把“最新提议”误当成“最终决定”。
 
-1. **运行与导入**：基于上游启动服务，一份中文会议记录完成入库、状态查询和原文读取。
-2. **检索与来源**：真实检索、重排、回答与引用点击形成闭环。
-3. **决定与变更**：验证“提议不等于确认”和前后变更的证据判断。
-4. **会话与维护**：连续追问、刷新与重启恢复、删除及失效引用。
-5. **评测与交付**：冻结题集、记录实际结果，完成可复现安装与演示。
+## 怎么实现
 
-## 版本与许可
+事实类问题走**向量检索 → BGE 重排 → 带引用回答**；决定与变更类问题在预算内分页读取所选会议，逐场核对后按日期整理。超出阅读预算时提示缩小范围。
 
-上游固定到已研究的提交，实际引入方式、许可与修改记录见 [来源记录](docs/upstream.md) 与
-[补丁记录](docs/upstream/patches.md)。三个二开目录保留各自 MIT 许可；本项目自身以 MIT 许可发布
-（见 [LICENSE](LICENSE)），模拟评测数据与结果仅用于本地验证。
+```mermaid
+flowchart TD
+    W[Web · Next.js / React / CopilotKit Runtime]
+    A[Agent · FastAPI / LangChain / LangGraph]
+    R[R2R · 文档解析 / 分块 / 范围检索]
+    P[(PostgreSQL + pgvector<br/>rag_db / agent_db)]
+    G[模型网关 · 本地 BGE Embedding / 生成代理]
+    L[生成模型 API]
+    W -->|AG-UI 流式问答| A
+    W -->|上传 / 原文 / 删除| R
+    A -->|检索 / 读取会议| R
+    A -->|会话 checkpoint| P
+    R -->|文档与向量| P
+    R -->|Embedding| G
+    A -->|生成| G
+    G --> L
+```
 
-## 实施包与 dsh 执行入口
+| 模块 | 基于什么 | 本项目的改造 |
+|---|---|---|
+| Agent | [agent-service-toolkit](https://github.com/JoshuaC215/agent-service-toolkit) | 会议范围约束、事实与决定两条路径、结构化回答和引用 |
+| 文档与检索 | [R2R](https://github.com/SciPhi-AI/R2R) | 会议元数据、项目隔离、原文定位、导入与删除适配 |
+| Web 与交互 | [R2R-Application](https://github.com/SciPhi-AI/R2R-Application) + [CopilotKit](https://github.com/CopilotKit/CopilotKit) | 批量导入、范围选择、流式状态、来源面板、历史回答匹配 |
+| 向量与重排 | [FastEmbed](https://github.com/qdrant/fastembed) + BGE | 本地中文向量模型与交叉编码器重排；FlashRank 为可选后端 |
+| 离线评测 | [Ragas](https://github.com/vibrantlabsai/ragas) + 规则检查 | 冻结题集、三组策略对照与来源核验；Ragas 目前仅完成少量样本试跑 |
 
-第一版实施包位于 [specs/001-v0.1](specs/001-v0.1/README.md)。执行进展、任务状态与验收结果：
-[docs/evidence/v0.1-acceptance.md](docs/evidence/v0.1-acceptance.md)；夜间恢复调度回执在本地 `.run/v0.1/`（不提交）。
+源码按 `apps/web`、`apps/agent`、`apps/rag` 分开；模型适配在 `services/model-gateway`，数据与评测在 `evals`。上游版本、许可和采用边界见[来源记录](docs/upstream.md)。
 
-- [架构与模块](specs/001-v0.1/design/architecture.md) · [模块详细设计](specs/001-v0.1/design/modules.md) · [接口契约](specs/001-v0.1/contracts/interfaces.md)
-- [任务与依赖图](specs/001-v0.1/tasks.md) · [最终验收](specs/001-v0.1/acceptance/checklist.md)
-- [完整 dsh /goal](specs/001-v0.1/dsh-goal.md) · [北京时间 01:30–09:30 恢复检查](specs/001-v0.1/operations/resume.md)
+## 验证与边界
 
-在仓库根目录发起执行者；运行状态与调度回执留在被忽略的 `.run/`，不提交到公开仓库。
+- 内置 **3 个模拟项目、18 份会议、36 道问题**，其中 24 道为冻结测试题；对照纯向量、加入重排、加入完整会议核对三种策略。[评测报告](docs/evidence/evaluation-summary-v0.1.1.md)保留失败题与坏例，关键词命中不等同于答案准确率。
+- 历史回答匹配与接口契约已有[检查记录](docs/releases/v0.1.1-preview.md#验证记录)。Ragas 仅试跑 2 个样本，含判分失败；完整 Docker Compose 部署仍待验证。
+- 首版只处理已有文字记录，采用本地单账号；语音转写、自动入会和团队协作暂未提供。生成环节需要外部模型 API。
+
+## 文档与许可
+
+[安装与配置](docs/usage/install.md) · [演示数据](docs/usage/demo.md) · [备份与恢复](docs/usage/operations.md) · [架构与模块](specs/001-v0.1/design/architecture.md) · [接口契约](specs/001-v0.1/contracts/interfaces.md)
+
+[MIT License](LICENSE)。本项目基于上述开源项目二次开发，保留各上游许可与版权声明，详见[许可清单](docs/upstream/licenses.md)。

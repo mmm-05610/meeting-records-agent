@@ -1,6 +1,6 @@
-# 安装与运行（v0.1）
+# 安装与运行（v0.1.1 预览版）
 
-v0.1 是本地单用户产品：一个 Web 入口（只监听 127.0.0.1:3000）、一个 Agent 服务、一个 R2R 文档服务、
+当前版本是本地单用户产品：一个 Web 入口（只监听 127.0.0.1:3000）、一个 Agent 服务、一个 R2R 文档服务、
 一个 PostgreSQL 实例（`rag_db` + `agent_db`）和一个本地模型网关（embedding + 生成代理）。
 
 本仓库提供两种运行方式：
@@ -12,19 +12,29 @@ v0.1 是本地单用户产品：一个 Web 入口（只监听 127.0.0.1:3000）�
 
 ## 0. 前提
 
-- Linux x86_64，约 10 GB 磁盘、4 GB 内存以上；Python 3.12（uv 可自动下载）、Node.js 22、pnpm。
+- Linux x86_64；当前安装脚本使用 Debian / Ubuntu 的 `apt-get`、`dpkg`，软件源必须能提供 PostgreSQL 18 的服务端、客户端和开发包。其他发行版尚未验证。
+- Python 3.12（uv 可自动下载）、uv、Node.js 22、pnpm；以及 Git、curl、make、C/C++ 编译工具、`envsubst`（gettext）。
+- 为依赖、模型和数据库预留磁盘与内存；现有安装建议至少 10 GB 可用磁盘、4 GB 内存，这不是最低配置压测结果。
 - 一个可用的 OpenAI 兼容生成端点。本机验证使用 opencode-go 端点（`https://opencode.ai/zen/go/v1`），
-  生成模型 `minimax-m3.1-flash-free`，需要 `OPENCODE_GO_API_KEY`。
+  当前默认生成模型 `deepseek-v4.1-flash`，需要 `OPENCODE_GO_API_KEY`。
 - embedding 不需要外部服务：模型网关用本地 ONNX 模型 `BAAI/bge-small-zh-v1.5`（512 维），
   首次启动下载约 100 MB；重排用 `BAAI/bge-reranker-base`（首次约 1 GB，缓存于 `.local/`）。
 
 ## 1. 配置
 
 ```bash
-cp .env.example .env            # 填入 OPENCODE_GO_API_KEY 等；.env 已被 .gitignore 忽略
+cp .env.example .env
+cp apps/web/.env.local.example apps/web/.env.local
+# 编辑这两份本地配置；它们已被 .gitignore 忽略
 ```
 
-关键变量（完整列表见 `.env.example` 与 `apps/web/.env.local.example`）：
+配置时先完成以下几项：
+
+1. 在根 `.env` 填入生成服务密钥，设置自己的 `R2R_SECRET_KEY` 与本地账号密码。
+2. 根 `.env` 的 `R2R_SERVICE_EMAIL` / `R2R_SERVICE_PASSWORD` 应与 `R2R_ADMIN_EMAIL` / `R2R_ADMIN_PASSWORD` 一致。
+3. 将相同的 `R2R_ADMIN_EMAIL` / `R2R_ADMIN_PASSWORD` 填入 `apps/web/.env.local`，并生成随机的 `MRA_SESSION_SECRET`。Web 启动脚本不会自动读取根 `.env`。
+
+关键变量（完整列表见根 [环境模板](../../.env.example)与 [Web 环境模板](../../apps/web/.env.local.example)）：
 
 | 变量 | 用途 |
 |---|---|
@@ -41,6 +51,7 @@ cp .env.example .env            # 填入 OPENCODE_GO_API_KEY 等；.env 已被 .
 bash scripts/native/install-postgres.sh
 
 # 2.2 初始化集群、双库与角色
+mkdir -p logs backups
 bash scripts/native/init-db.sh
 
 # 2.3 Python/Node 依赖（每个应用独立环境）
@@ -82,9 +93,11 @@ bash scripts/native/service.sh stop web
 bash scripts/native/service.sh stop agent
 bash scripts/native/service.sh stop r2r
 bash scripts/native/service.sh stop gateway
-bash scripts/native/pg-env.sh && pg_ctl -D "$PGDATA" stop
+source scripts/native/pg-env.sh
+pg_ctl -D "$PGDATA" stop
 
 # 备份（两个数据库分别 dump）
+mkdir -p backups
 source scripts/native/pg-env.sh
 pg_dump -h 127.0.0.1 -p 55432 -U postgres -d rag_db   -Fc -f backups/rag_db.dump
 pg_dump -h 127.0.0.1 -p 55432 -U postgres -d agent_db -Fc -f backups/agent_db.dump
@@ -110,7 +123,7 @@ v0.1.1 修复：网关在容器内绑定 `0.0.0.0`；数据库初始化脚本用
 R2R 配置由 `deployment/r2r/render-config.py` 在启动时从模板渲染；五个服务都有健康检查；
 Web 镜像不再打包本地 `.env*`（`.dockerignore`）。
 
-完整容器验证记录见 [deployment-verification](../evidence/deployment-verification.md)。
+部署修复记录见 [deployment-verification](../evidence/deployment-verification.md)，当前发布边界见 [v0.1.1 预览版说明](../releases/v0.1.1-preview.md)。
 **本机没有 Docker 守护进程**：数据库初始化与模型网关已用 rootless podman 实测通过；
 R2R/Agent/Web 三个镜像的构建因磁盘余量与容器网络限制未实跑，因此整套 compose 的
 “从空 volume 安装→导入→问答→重启恢复”**仍属未验证**（A18 的通过证据来自 native 全新安装）。
