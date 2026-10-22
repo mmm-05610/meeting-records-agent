@@ -6,12 +6,12 @@
     {
       "name": "历史线程按角色显示用户问题",
       "ok": true,
-      "detail": "occurrences=7"
+      "detail": "occurrences=9"
     },
     {
       "name": "成功轮次显示为已完成",
       "ok": true,
-      "detail": "completed=4"
+      "detail": "completed=3"
     },
     {
       "name": "失败/重复轮次不再重复展示整段答案",
@@ -31,7 +31,7 @@
     {
       "name": "新会话刷新后仍为已完成",
       "ok": true,
-      "detail": "completed=4 incomplete=0"
+      "detail": "completed=3 incomplete=0"
     }
   ]
 }

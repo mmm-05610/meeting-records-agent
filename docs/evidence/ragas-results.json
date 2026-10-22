@@ -1,0 +1,53 @@
+{
+  "engine": "ragas",
+  "metrics": [
+    "faithfulness",
+    "context_precision"
+  ],
+  "ragas_version": "0.4.3",
+  "judge_model": "deepseek-v4.1-flash",
+  "judge_endpoint": "local model gateway -> opencode-go",
+  "embedding_model": "BAAI/bge-small-zh-v1.5 (512d, via gateway /v1/embeddings)",
+  "results_file": "evals/results/v0.1.1-B2-frozen/per_case.jsonl",
+  "cases_total_in_file": 24,
+  "cases_evaluated": 2,
+  "selection_rule": "按文件顺序取成功题，最多 limit 条；失败题不进入 Ragas 样本但保留在规则评测的全量分母中。",
+  "contexts_source": "仅使用产品实际返回的引用 quote 作为 retrieved_contexts（不是全库召回上下文）",
+  "reference_source": "题集人工标注的 acceptable_conclusion",
+  "elapsed_seconds": 154.5,
+  "aggregate": {
+    "faithfulness": {
+      "mean": 0.14285714285714285,
+      "n": 1,
+      "failed": 1
+    },
+    "context_precision": {
+      "mean": 0.749999999925,
+      "n": 2,
+      "failed": 0
+    }
+  },
+  "per_case": [
+    {
+      "case_id": "sim-a-05",
+      "split": "frozen",
+      "project": "模拟项目A：星河笔记",
+      "faithfulness": null,
+      "context_precision": 0.9999999999
+    },
+    {
+      "case_id": "sim-a-06",
+      "split": "frozen",
+      "project": "模拟项目A：星河笔记",
+      "faithfulness": 0.14285714285714285,
+      "context_precision": 0.49999999995
+    }
+  ],
+  "limitations": [
+    "Ragas judge 与生成模型同源（deepseek-v4.1-flash），存在自评偏好，仅作辅助。",
+    "只评测少量样本（--limit），不等于全量 24 题语义准确率。",
+    "retrieved_contexts 只含最终引用片段，偏低估计召回类指标（真实检索覆盖更广）。",
+    "Ragas 指标提示词与判定风格为通用英文/多语言模板，中文会议语义判断需人工复核样例配合。",
+    "answer_relevancy 依赖 embedding 相似度，本部署 embedding 为本地中文小模型。"
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "results_file": "evals/results/v0.1.1-B2-frozen/per_case.jsonl",
+  "cases": 24,
+  "quotes_total": 55,
+  "quotes_verified_verbatim": 55,
+  "quotes_out_of_project": 0,
+  "quotes_document_not_in_map": 0,
+  "all_reference_numbers_resolve": true,
+  "rule": "引用 document_id 必须属于请求项目；quote 忽略空白后必须逐字出现在对应模拟会议文件中；[n] 编号必须能在返回来源内解析。",
+  "cases_detail": [
+    {
+      "case_id": "sim-a-03",
+      "project": "模拟项目A：星河笔记",
+      "sources": 0,
+      "verified": 0,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-a-05",
+      "project": "模拟项目A：星河笔记",
+      "sources": 1,
+      "verified": 1,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-a-06",
+      "project": "模拟项目A：星河笔记",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-a-08",
+      "project": "模拟项目A：星河笔记",
+      "sources": 4,
+      "verified": 4,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-a-09",
+      "project": "模拟项目A：星河笔记",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-a-10",
+      "project": "模拟项目A：星河笔记",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-a-11",
+      "project": "模拟项目A：星河笔记",
+      "sources": 1,
+      "verified": 1,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-a-12",
+      "project": "模拟项目A：星河笔记",
+      "sources": 3,
+      "verified": 3,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-04",
+      "project": "模拟项目B：云仓物流",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-05",
+      "project": "模拟项目B：云仓物流",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-07",
+      "project": "模拟项目B：云仓物流",
+      "sources": 4,
+      "verified": 4,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-08",
+      "project": "模拟项目B：云仓物流",
+      "sources": 3,
+      "verified": 3,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-09",
+      "project": "模拟项目B：云仓物流",
+      "sources": 1,
+      "verified": 1,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-10",
+      "project": "模拟项目B：云仓物流",
+      "sources": 3,
+      "verified": 3,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-11",
+      "project": "模拟项目B：云仓物流",
+      "sources": 4,
+      "verified": 4,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-b-12",
+      "project": "模拟项目B：云仓物流",
+      "sources": 1,
+      "verified": 1,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-04",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 1,
+      "verified": 1,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-05",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 3,
+      "verified": 3,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-06",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-08",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 6,
+      "verified": 6,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-09",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-10",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 2,
+      "verified": 2,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-11",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 3,
+      "verified": 3,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    },
+    {
+      "case_id": "sim-c-12",
+      "project": "模拟项目C：青禾医疗",
+      "sources": 1,
+      "verified": 1,
+      "out_of_scope": 0,
+      "missing": 0,
+      "reference_numbers_resolve": true,
+      "details": []
+    }
+  ]
+}

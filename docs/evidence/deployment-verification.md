@@ -58,3 +58,21 @@ podman run -d --name mra-verify-gw --network host \
 - 因此 R2R/Agent/Web 容器镜像的构建与整套 Compose 的导入/问答/引用/重启恢复**未实测**，
   不能据此声明容器部署通过；原生路径的同等链路已有 v0.1 的完整证据（A18 等）。
 - 已用 `podman-compose config` 校验 Compose 文件在环境变量齐全时可解析、依赖条件与挂载路径正确。
+
+## 配置一致性对照（D4）
+
+| 配置项 | 原生（根 `.env`） | 容器（`deployment/env/local.env`） | 模板/默认 |
+|---|---|---|---|
+| 生成模型 | `COMPATIBLE_MODEL=deepseek-v4.1-flash` | 同名变量（Compose 透传，默认同值） | `agent-env.sh` / Compose |
+| 模型网关地址 | `GATEWAY_PORT=8081`、`OPENAI_API_BASE=http://127.0.0.1:8081/v1` | 服务名 `http://model-gateway:8081/v1`、`GATEWAY_HOST=0.0.0.0` | `gateway.py` 默认仅 loopback |
+| PostgreSQL | `PGPORT=55432`、`RAG_DB`/`agent_db` | 容器内 `5432`，双库由 init 脚本创建 | `scripts/native/init-db.sh` / `init-databases.sh` |
+| R2R 配置 | `deployment/r2r/meeting_records.toml.template` 由 `start-r2r.sh` envsubst | 由 `render-config.py` 在容器启动时渲染 | 同一模板 |
+| 重排 | `MEETING_RERANK_BACKEND=fastembed`、`MEETING_RERANK_MODEL=BAAI/bge-reranker-base` | 同左 | 代码默认 fastembed |
+| 会话 Cookie | `apps/web/.env.local`（`MRA_SESSION_SECRET`） | Compose 透传同名变量 | `apps/web/.env.local.example` |
+| Web 端口 | `WEB_PORT=3000`（脚本） | `WEB_PORT`（Compose 端口映射，默认 3000） | `start-web.sh` |
+
+## 数据库结构变更与恢复
+
+- v0.1.1 **没有修改数据库结构**：R2R（`rag_db`）与 LangGraph checkpoint（`agent_db`）表结构沿用上游迁移；
+  唯一数据库相关改动是容器初始化脚本设置角色密码，不影响已有实例。
+- 备份/恢复办法沿用 `docs/usage/operations.md`（`pg_dump`/`pg_restore` 双库），无需额外迁移。

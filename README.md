@@ -2,8 +2,10 @@
 
 会议记录问答助手：导入一个项目的多次会议记录，查清“最后怎么定的、谁负责、为什么改了”，并通过引用核对原文。
 
-**当前状态：v0.1 已实现并在本机真实链路验证。** 三个应用基于固定上游二次开发，可在本机安装、导入中文会议记录、跨会议问答并逐项核对引用；评测、验收证据与已知限制见
-[docs/evidence/v0.1-acceptance.md](docs/evidence/v0.1-acceptance.md) 与 [docs/evidence/evaluation-summary.md](docs/evidence/evaluation-summary.md)。
+**当前状态：v0.1.1 已实现并在本机真实链路验证。** 三个应用基于固定上游二次开发，可在本机安装、导入中文会议记录、跨会议问答并逐项核对引用；评测、验收证据与已知限制见
+[docs/evidence/v0.1.1-acceptance.md](docs/evidence/v0.1.1-acceptance.md)、
+[docs/evidence/evaluation-summary-v0.1.1.md](docs/evidence/evaluation-summary-v0.1.1.md) 与
+[交付说明](docs/delivery-v0.1.1.md)。
 
 ## v0.1 要做什么
 

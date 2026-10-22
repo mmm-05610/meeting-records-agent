@@ -1,0 +1,75 @@
+{
+  "results_file": "evals/results/v0.1.1-B2-frozen/per_case.jsonl",
+  "cases_total": 24,
+  "completed": 23,
+  "completion_rate": 0.9583333333333334,
+  "failures": [
+    {
+      "case_id": "sim-a-03",
+      "category": "service_failure",
+      "message": "timed out"
+    }
+  ],
+  "failure_categories": {
+    "service_failure": 1
+  },
+  "evidence_recall": {
+    "all_questions_quotes_matched": 43,
+    "all_questions_quotes_expected": 51,
+    "success_only": {
+      "matched": 43,
+      "total": 48
+    },
+    "note": "分母是题目声明的必需证据条数（按题集统计，失败题也计入 all_questions 分母，匹配数按 0 计）；成功题条件另列。"
+  },
+  "citation": {
+    "all_questions": {
+      "matched": 23,
+      "total": 24,
+      "rate": 0.9583333333333334
+    },
+    "success_only": {
+      "matched": 23,
+      "total": 23,
+      "rate": 1.0
+    },
+    "note": "引用存在性与范围正确性是结构检查，不代表引用语义上支持结论。"
+  },
+  "decision_kind": {
+    "all_questions": {
+      "matched": 22,
+      "total": 24,
+      "rate": 0.9166666666666666
+    },
+    "success_only": {
+      "matched": 22,
+      "total": 23,
+      "rate": 0.9565217391304348
+    },
+    "note": "标签匹配只比较 claim.kind 是否包含期望标签。"
+  },
+  "conclusion_keyword_hit": {
+    "all_questions": {
+      "matched": 23,
+      "total": 24,
+      "rate": 0.9583333333333334
+    },
+    "success_only": {
+      "matched": 23,
+      "total": 23,
+      "rate": 1.0
+    },
+    "note": "结论命中是人工标准答案关键词匹配，不是问答准确率，也不是语义正确率。"
+  },
+  "latency_ms": {
+    "p50": 37244,
+    "p90": 171755,
+    "p95": 205086,
+    "max": 226083,
+    "mean": 65780.0
+  },
+  "cost": {
+    "price_known": false,
+    "note": "供应商未提供可核算单价；embedding 为本地模型，无 API 费用。"
+  }
+}

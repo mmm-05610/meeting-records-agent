@@ -96,15 +96,24 @@ pg_restore -h 127.0.0.1 -p 55432 -U postgres -d rag_restore backups/rag_db.dump
 
 `pgvector` 索引与 R2R schema（`meeting_records_agent`）随 `rag_db` 一起备份；Agent 的 checkpoint 在 `agent_db`。
 
-## 5. docker compose（交付形态）
+## 5. 容器部署（docker compose / podman-compose）
 
 ```bash
 cp deployment/env/local.env.example deployment/env/local.env   # 填入密码与密钥
 docker compose -f deployment/docker-compose.yaml --env-file deployment/env/local.env up -d --build
+# 或
+podman-compose -f deployment/docker-compose.yaml --env-file deployment/env/local.env up -d --build
 ```
 
-只有 web 发布到 `127.0.0.1:3000`；R2R、Agent、PostgreSQL、模型网关都在内部网络。
-**本机没有可用的 Docker 守护进程，因此该路径未实跑**，不作为 A18 的证据；本机证据来自 native 模式。
+只有 web 发布到 `127.0.0.1:3000`（可用 `WEB_PORT` 覆盖）；R2R、Agent、PostgreSQL、模型网关都在内部网络。
+v0.1.1 修复：网关在容器内绑定 `0.0.0.0`；数据库初始化脚本用环境变量设置两个应用角色密码；
+R2R 配置由 `deployment/r2r/render-config.py` 在启动时从模板渲染；五个服务都有健康检查；
+Web 镜像不再打包本地 `.env*`（`.dockerignore`）。
+
+完整容器验证记录见 [deployment-verification](../evidence/deployment-verification.md)。
+**本机没有 Docker 守护进程**：数据库初始化与模型网关已用 rootless podman 实测通过；
+R2R/Agent/Web 三个镜像的构建因磁盘余量与容器网络限制未实跑，因此整套 compose 的
+“从空 volume 安装→导入→问答→重启恢复”**仍属未验证**（A18 的通过证据来自 native 全新安装）。
 
 ## 6. 已知限制
 
